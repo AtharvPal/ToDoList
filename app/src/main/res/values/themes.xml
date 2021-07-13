@@ -14,6 +14,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="fontFamily">@font/montserrat</item>
+        <item name="backgroundColor">@color/black</item>
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
@@ -23,8 +24,29 @@
         <item name="android:editTextColor">@color/teal_200</item>
     </style>
     <style name="allDetailsTextColor">
-        <item name="android:textColor">
-            @color/white
-        </item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+
+
+<!--    <style name="naya" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">-->
+<!--        &lt;!&ndash; Primary brand color. &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/white</item>-->
+<!--        <item name="colorPrimaryVariant">@color/purple_700</item>-->
+<!--        <item name="colorOnPrimary">@color/white</item>-->
+<!--        &lt;!&ndash; Secondary brand color. &ndash;&gt;-->
+<!--        <item name="colorSecondary">@color/teal_200</item>-->
+<!--        <item name="colorSecondaryVariant">@color/teal_700</item>-->
+<!--        <item name="colorOnSecondary">@color/black</item>-->
+<!--        &lt;!&ndash; Status bar color. &ndash;&gt;-->
+<!--        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>-->
+<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+
+<!--    </style>-->
+
+
+    <style name="okay" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">@color/box_outlines</item>
+        <item name="boxBackgroundColor">@color/gray</item>
     </style>
 </resources>

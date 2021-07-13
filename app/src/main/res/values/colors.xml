@@ -7,15 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="gray">#818181</color>
+    <color name="gray">#202020</color>
 
     <color name="colorPrimary">#4CAF50</color>
     <color name="colorPrimaryDark">#388E3C</color>
     <color name="colorAccent">#ff7058</color>
     <color name="litherGray">#a1a1a1</color>
-    <color name="green">#388E3C</color>
     <color name="red">#D32F2F</color>
-
+    <item name="green" type="color">#2baf2b</item>
 
     <array name="random_color">
         <item name="red_400" type="color">#e84e40</item>

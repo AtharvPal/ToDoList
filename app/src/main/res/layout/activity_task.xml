@@ -3,14 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/black"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".TaskActivity">
+
+<!--    background color of New Task is by background tint-->
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/gray"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
@@ -18,7 +22,7 @@
             app:title="New Task"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?attr/colorPrimary"
+
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -29,17 +33,29 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="4dp"
-        android:text="Task Title"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp" />
+        android:text="Title"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/okay"
+        android:theme="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="Enter Title"
+        android:textColorHint="@color/white"
+        app:hintTextColor="@color/white"
+        app:counterEnabled="true"
+        app:counterMaxLength="16"
+        app:helperTextEnabled="true"
+        app:helperTextTextColor="@color/red"
+        app:errorEnabled="false"
+        app:errorTextColor="@color/red"
+        app:boxStrokeErrorColor="@color/red"
+        app:counterOverflowTextColor="@color/red"
         android:layout_marginStart="16dp"
         android:id="@+id/titleInpLay"
-        app:hintTextColor="@color/colorAccent"
-        app:boxStrokeColor="@color/colorAccent"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp">
 
@@ -47,10 +63,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter Task title"
+            android:textCursorDrawable="@drawable/cursor"
+            android:textColor="@color/white"
             android:paddingStart="8dp"
             android:inputType="textCapWords"
             android:paddingEnd="8dp"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -59,28 +77,43 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="4dp"
         android:text="What is to be done?"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp" />
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/okay"
+        android:theme="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="A short description"
+        android:textColorHint="@color/white"
+        app:hintTextColor="@color/white"
+        app:counterEnabled="true"
+        app:counterMaxLength="16"
+        app:helperTextEnabled="true"
+        app:helperTextTextColor="@color/red"
+        app:errorEnabled="false"
+        app:errorTextColor="@color/red"
+        app:boxStrokeErrorColor="@color/red"
+        app:counterOverflowTextColor="@color/red"
         android:layout_marginStart="16dp"
-        app:hintTextColor="@color/colorAccent"
-        app:boxStrokeColor="@color/colorAccent"
-        android:layout_marginEnd="16dp"
         android:id="@+id/taskInpLay"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp">
+
+
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textCursorDrawable="@drawable/cursor"
+            android:textColor="@color/white"
             android:hint="Enter your Task"
             android:lines="3"
             android:gravity="start"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -89,15 +122,18 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="4dp"
         android:text="Set reminder date and time"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp" />
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/okay"
+        android:theme="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:hint="Set Date"
+        android:textColorHint="@color/white"
+        app:hintTextColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:hintTextColor="@color/colorAccent"
-        app:boxStrokeColor="@color/colorAccent"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp">
 
@@ -106,25 +142,28 @@
             android:layout_height="wrap_content"
             android:hint="Set Date"
             android:clickable="true"
+            android:textColor="@color/white"
             android:id="@+id/dateEdt"
             android:cursorVisible="false"
             android:drawablePadding="8dp"
             android:drawableEnd="@drawable/ic_date_range_black_24dp"
-            android:drawableTint="@color/colorAccent"
+            android:drawableTint="@color/white"
             android:focusable="false"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/okay"
+        android:theme="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:textColorHint="@color/white"
+        android:hint="Set Time"
+        app:hintTextColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:hintTextColor="@color/colorAccent"
-        app:boxStrokeColor="@color/colorAccent"
-        android:visibility="gone"
         android:id="@+id/timeInptLay"
         android:layout_marginBottom="16dp">
 
@@ -133,15 +172,16 @@
             android:layout_height="wrap_content"
             android:hint="Set Time"
             android:clickable="true"
+            android:textColor="@color/white"
             android:id="@+id/timeEdt"
             android:cursorVisible="false"
             android:drawablePadding="8dp"
             android:drawableEnd="@drawable/ic_access_time_black_24dp"
-            android:drawableTint="@color/colorAccent"
+            android:drawableTint="@color/white"
             android:focusable="false"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
@@ -166,18 +206,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_playlist_add_black_24dp"
-            android:tint="@color/colorAccent" />
+            app:tint="@color/white" />
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
+<!--    the below view is just to push the button to the bottom of the -->
+<!--    screen. It doesn't serve any purpose whatsoever. If you want to -->
+<!--    see how buttom will align normally, remove the below view-->
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <Button
         android:text="Save Task"
         android:id="@+id/saveBtn"
-        app:backgroundTint="@color/colorAccent"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:layout_gravity="end"
-        app:cornerRadius="25dp"
-        android:layout_width="wrap_content"
+        android:textColor="@color/black"
+        android:textFontWeight="800"
+        app:backgroundTint="@color/white"
+        android:layout_gravity="bottom"
+        android:textSize="18sp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
 
