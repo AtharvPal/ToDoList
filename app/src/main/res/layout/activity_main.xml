@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:clickable="false"
     android:background="@color/black"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -11,7 +12,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wo ho! Nothing to do!"
+        android:text="No items"
         android:textSize="30sp"
         android:textColor="@color/white"
         android:layout_centerHorizontal="true"
@@ -23,7 +24,7 @@
         android:id="@+id/toolbar"
         android:theme="@style/top"
         app:titleTextColor="@color/white"
-        android:background="#202020"
+        android:background="@color/gray"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

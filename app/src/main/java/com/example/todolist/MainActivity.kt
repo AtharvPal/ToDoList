@@ -4,10 +4,11 @@ import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
@@ -21,8 +22,11 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    val list = arrayListOf<TodoModel>()
+    var list = arrayListOf<TodoModel>()
     var adapter = TodoAdapter(list)
+
+    private val labels =
+        arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
 
     val db by lazy {
         AppDatabase.getDatabase(this)
@@ -36,6 +40,7 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = this@MainActivity.adapter
         }
+
 
         initSwipe()
 
@@ -54,64 +59,88 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         val item = menu.findItem(R.id.search)
         val searchView = item.actionView as SearchView
+        val item2 = menu.findItem(R.id.categories)
+        val spinner = item2.actionView as Spinner
+        val adapter = ArrayAdapter<String>(this, R.layout.spinner_item_layout, labels)
+        spinner.adapter = adapter
         searchView.maxWidth = 10000
-        item.setOnActionExpandListener(object :MenuItem.OnActionExpandListener{
-            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                displayTodo()
-                Toast.makeText(this@MainActivity,"first",Toast.LENGTH_SHORT).show()
-                return true
-            }
 
-            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                displayTodo()
-                Toast.makeText(this@MainActivity,"second",Toast.LENGTH_SHORT).show()
-                return true
-            }
+//        item.setOnActionExpandListener(object :MenuItem.OnActionExpandListener{
+//            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+//                displayTodo()
+//                Toast.makeText(this@MainActivity,"first",Toast.LENGTH_SHORT).show()
+//                return true
+//            }
+//
+//            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+//                displayTodo()
+//                Toast.makeText(this@MainActivity,"second",Toast.LENGTH_SHORT).show()
+//                return true
+//            }
+//
+//
+//        })
 
-
-        })
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Toast.makeText(this@MainActivity,"thir",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "thir", Toast.LENGTH_SHORT).show()
                 return false
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if(!newText.isNullOrEmpty()){
+            override fun onQueryTextChange(newText: String): Boolean {
                     displayTodo(newText)
-                }
                 return true
             }
 
+
         })
-        searchView.setOnCloseListener(object:SearchView.OnCloseListener{
+        searchView.setOnCloseListener(object : SearchView.OnCloseListener {
             override fun onClose(): Boolean {
                 displayTodo()
-                Toast.makeText(this@MainActivity,"fourth",Toast.LENGTH_SHORT).show()
                 return false
             }
 
         })
 
+
+
+
+
+        spinner.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {    // idk why tf this has to be done like this
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                displayTodo2(labels[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {    // is this ever called ????
+                Toast.makeText(this@MainActivity, "nothing", Toast.LENGTH_SHORT).show()
+            }
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
     fun displayTodo(newText: String = "") {
         db.todoDao().getTask().observe(this, Observer {
-            if(it.isNotEmpty()){
+            if (it.isNotEmpty()) {
                 list.clear()
-                if(TextUtils.isEmpty(newText))
+                if (TextUtils.isEmpty(newText))
                     list.addAll(it)
-                list.addAll(
-                    it.filter { todo ->
-                        todo.title.contains(newText,true)
-                    }
-                )
+                else {
+                    list.addAll(
+                        it.filter { todo ->
+                            todo.title.contains(newText, true)
+                        }
+                    )
+                }
                 adapter.notifyDataSetChanged()
             }
             if (list.isEmpty())
@@ -121,12 +150,31 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-
-    fun openNewTask(view: View) {
-        startActivity(Intent(this, TaskActivity::class.java))
+    fun displayTodo2(newText: String) {
+        db.todoDao().getTask().observe(this, Observer {
+            if (it.isNotEmpty()) {
+                list.clear()
+                if (TextUtils.equals(newText, "All"))
+                    list.addAll(it)
+                else {
+                    list.addAll(
+                        it.filter { todo ->
+                            todo.category.contains(newText, true)
+                        }
+                    )
+                }
+                adapter.notifyDataSetChanged()
+            }
+            if (list.isEmpty())
+                emptyList.visibility = View.VISIBLE
+            else
+                emptyList.visibility = View.GONE
+        })
     }
 
-
+    fun openNewTask(view: View) {
+        startActivity(Intent(this,TaskActivity::class.java))
+    }
 
 
 

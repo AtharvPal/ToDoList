@@ -21,7 +21,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
     <style name="top">
-        <item name="android:editTextColor">@color/teal_200</item>
+        <item name="android:editTextColor">@color/white</item>
     </style>
     <style name="allDetailsTextColor">
         <item name="android:textColor">@color/white</item>

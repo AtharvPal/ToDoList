@@ -10,32 +10,50 @@
 
 <!--    background color of New Task is by background tint-->
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/gray"
-        android:theme="@style/AppTheme.AppBarOverlay">
+<!--    <com.google.android.material.appbar.AppBarLayout-->
+<!--        android:id="@+id/appBarLayout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:backgroundTint="@color/gray"-->
+
+<!--        android:theme="@style/AppTheme.AppBarOverlay">-->
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarAddTask"
-            app:title="New Task"
+            android:background="@color/gray"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="New Task"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textAlignment="center"/>
+
+        </androidx.appcompat.widget.Toolbar>
+
+
+
+<!--    </com.google.android.material.appbar.AppBarLayout>-->
+
+
+
+
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="2dp"
         android:text="Title"
         android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/okay"
@@ -44,10 +62,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Title"
+        android:id="@+id/titleInpLay"
         android:textColorHint="@color/white"
         app:hintTextColor="@color/white"
         app:counterEnabled="true"
-        app:counterMaxLength="16"
+        app:counterMaxLength="20"
         app:helperTextEnabled="true"
         app:helperTextTextColor="@color/red"
         app:errorEnabled="false"
@@ -55,30 +74,29 @@
         app:boxStrokeErrorColor="@color/red"
         app:counterOverflowTextColor="@color/red"
         android:layout_marginStart="16dp"
-        android:id="@+id/titleInpLay"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="10dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Task title"
             android:textCursorDrawable="@drawable/cursor"
             android:textColor="@color/white"
             android:paddingStart="8dp"
+            android:id="@+id/title_task"
             android:inputType="textCapWords"
             android:paddingEnd="8dp"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="2dp"
         android:text="What is to be done?"
         android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/okay"
@@ -99,7 +117,7 @@
         android:layout_marginStart="16dp"
         android:id="@+id/taskInpLay"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="10dp">
 
 
 
@@ -108,12 +126,12 @@
             android:layout_height="wrap_content"
             android:textCursorDrawable="@drawable/cursor"
             android:textColor="@color/white"
-            android:hint="Enter your Task"
             android:lines="3"
+            android:id="@+id/desc_task"
             android:gravity="start"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -123,7 +141,7 @@
         android:layout_marginBottom="4dp"
         android:text="Set reminder date and time"
         android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/okay"
@@ -135,7 +153,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="10dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -151,7 +169,7 @@
             android:focusable="false"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -165,7 +183,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:id="@+id/timeInptLay"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="10dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -181,32 +199,35 @@
             android:focusable="false"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="4dp"
+        android:text="Select category"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+
         android:orientation="horizontal"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginStart="16dp">
 
         <Spinner
             android:id="@+id/spinnerCategory"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-        <ImageView
-            android:id="@+id/imgAddCategory"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_playlist_add_black_24dp"
-            app:tint="@color/white" />
+
     </LinearLayout>
 
 <!--    the below view is just to push the button to the bottom of the -->
@@ -220,9 +241,7 @@
         android:text="Save Task"
         android:id="@+id/saveBtn"
         android:textColor="@color/black"
-        android:textFontWeight="800"
         app:backgroundTint="@color/white"
-        android:layout_gravity="bottom"
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
