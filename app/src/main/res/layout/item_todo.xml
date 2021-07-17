@@ -99,6 +99,16 @@
             android:visibility="visible"
             tools:text="22:12 AM" />
 
+        <ImageButton
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_baseline_share_24"
+            android:tint="@color/green"
+            android:id="@+id/share"
+            android:background="@android:color/transparent"
+            android:layout_below="@+id/txtShowTask"/>
+
     </RelativeLayout>
 
 <!--    </RelativeLayout>-->

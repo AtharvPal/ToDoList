@@ -1,24 +1,30 @@
 package com.example.todolist
 
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.DatePicker
-import android.widget.TimePicker
-import android.widget.Toast
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_task.*
+import kotlinx.android.synthetic.main.dialog_layout.*
+import kotlinx.android.synthetic.main.item_todo.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.FieldPosition
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -43,6 +49,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         AppDatabase.getDatabase(this)
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task)
@@ -57,8 +64,19 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         var category2 = getIntent().getStringExtra("category").toString()
         var date2 = getIntent().getStringExtra("date")
         var time2 = getIntent().getStringExtra("time")
-        if(title2!=null)
+        var position2 = getIntent().getIntExtra("position",-1)
+        Log.e("ok2",position2.toString())
+
+//        var imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager   // idk why tf this doesn't work
+//        imm.showSoftInput(titleInpLay,InputMethodManager.SHOW_FORCED)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)   // why do I have to write this?
+        if(title2!=null) {
             title_task.setText(title2.toString())
+            addtask.text = "Edit Task"
+            // below is to set cursor position of title at end of the textview
+            title_task.setSelection(title_task.text.toString().length)
+        }
+
         if(desc2!=null)
             desc_task.setText(desc2.toString())
         desc_task.setText(desc2)
@@ -67,6 +85,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         if(time2!=null)
             updateTime2(time2.toString())
 
+        // how the fuck people do android dev? it is literally fucking trash
 
         var spinner_adapter = spinnerCategory.adapter as ArrayAdapter<String>
         var pos = spinner_adapter.getPosition(category2)
@@ -75,6 +94,29 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
+    override fun onBackPressed() {
+        var dialog = Dialog(titleInpLay.context)
+        dialog.setContentView(R.layout.dialog_layout)
+        dialog.show()
+        var dialog_text = "Discard To Do?"
+
+        // this is to determine whether task activity is opened for new/update
+        // task; depending on that, the text of dialog changes
+        var title2 = getIntent().getStringExtra("title")
+        if(title2!=null)
+            dialog_text = "Discard changes?"
+        var discard = dialog.findViewById<TextView>(R.id.discard)
+        var cancel_button = dialog.findViewById<Button>(R.id.cancel_button)
+        var yes_button = dialog.findViewById<Button>(R.id.yes_button)
+        discard.text = dialog_text
+//        yes_button.setBackgroundColor(Color.RED)  // why this doesn't happen???
+        cancel_button.setOnClickListener {
+            dialog.dismiss()
+        }
+        yes_button.setOnClickListener {
+            finish()
+        }
+    }
     private fun setUpSpinner() {
         val adapter =
             ArrayAdapter<String>(this, R.layout.spinner_item_layout, labels)
@@ -83,6 +125,11 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View) {
+
+//         hide the keyboard if open (as you don't need a keyboard for date or time editing)
+        var imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(title_task.windowToken,0)
+        imm.hideSoftInputFromWindow(desc_task.windowToken,0)
         when (v.id) {
             R.id.dateEdt -> {
                 setListener()
@@ -91,13 +138,15 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
                 setTimeListener()
             }
             R.id.saveBtn -> {
-                saveTodo()
+                var position2 = getIntent().getIntExtra("position",-1)
+                Log.e("ok3",position2.toString())
+                saveTodo(position2)
             }
         }
 
     }
 
-    private fun saveTodo() {
+    private fun saveTodo(position: Int) {
         val category = spinnerCategory.selectedItem.toString()
         val title = titleInpLay.editText?.text.toString()
         val description = taskInpLay.editText?.text.toString()
@@ -107,8 +156,18 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             Toast.makeText(titleInpLay.context,"Please select a date",Toast.LENGTH_SHORT).show()
         else if(finalTime==0L)
             Toast.makeText(titleInpLay.context,"Please select a time",Toast.LENGTH_SHORT).show()
+
+
         else {
-            GlobalScope.launch(Dispatchers.Main) {
+            var is_updated = false
+            if (position!=-1){
+                is_updated = true
+                GlobalScope.launch(Dispatchers.IO) {
+                    db.todoDao().deleteTask(position.toLong())
+                }
+            }
+
+            GlobalScope.launch(Dispatchers.Main){
                 val id = withContext(Dispatchers.IO) {
                     return@withContext db.todoDao().insertTask(
                         TodoModel(
@@ -120,8 +179,13 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
                         )
                     )
                 }
-                finish()
             }
+            var msg = "To Do saved"
+            if(is_updated)
+                msg = "To Do updated"
+            Snackbar.make(findViewById(android.R.id.content),msg,Snackbar.LENGTH_SHORT).show()
+            Toast.makeText(this@TaskActivity,msg,Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 
@@ -186,7 +250,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         //Mon, 5 Jan 2020
         myCalendar = Calendar.getInstance()
         var n = currDate.length
-        Log.e("len",n.toString())
+//        Log.e("len",n.toString())
         if(n==16) {
             myCalendar.set(Calendar.YEAR, currDate.substring(12, 16).toInt())
             for(i in 0..11){
@@ -224,7 +288,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
         myCalendar = Calendar.getInstance()
         var n = currTime.length
-        Log.e("len",n.toString())
+//        Log.e("len",n.toString())
         if(n==8){
             var am_pm = currTime.substring(6,8);
             if(am_pm=="am")

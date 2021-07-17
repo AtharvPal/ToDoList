@@ -5,11 +5,11 @@
 
     <item android:id="@+id/categories"
         android:title="All"
-
         app:actionViewClass="android.widget.Spinner"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom" />
     <item android:id="@+id/search"
         android:title="Search"
+        app:queryBackground="@android:color/transparent"
         android:icon="@drawable/ic_baseline_search_24"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always"/>

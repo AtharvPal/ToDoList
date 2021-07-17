@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/black"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/discard"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="5dp"
+        android:text="Discard ?"
+        android:textColor="@color/white"/>
+    <LinearLayout
+        android:layout_below="@+id/discard"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+
+        <!--    below view is just to push the YES and CANCEL button to right, it-->
+        <!--        has no purpose whatsoever-->
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"/>
+
+        <!--        both buttons have background as transparent as I did'nt like -->
+        <!--        the default ripple effect, remove the background attribute to -->
+        <!--        see it-->
+
+
+        <!--        On the "how to customize ripple effect" part, using Material Components
+                    library v1.1.0, the background is by default a RippleDrawable with its color
+                    set to a ColorStateList of 2 colors: A 26 alpha (#A1 in hex) colorControlActivated
+                    in enabled and checked state, and for the default state an alpha white or black
+                    depending on whether you have a light (#1F000000) or dark theme (#33FFFFFF).
+                    I retrieved this info simply by inspecting the background of a MaterialCheckBox
+                    in the debugger.-->
+
+        <!--        You can just override the color of the RippleDrawable however you wish using its
+                    setColor method.-->
+
+        <Button
+
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:id="@+id/yes_button"
+            android:background="@android:color/transparent"
+            android:textColor="@color/green"
+            android:textSize="14sp"
+            android:text="Yes"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:id="@+id/cancel_button"
+            android:backgroundTint="@color/black"
+            android:textColor="@color/green"
+            android:background="@android:color/transparent"
+            android:textSize="14sp"
+            android:text="Cancel"/>
+    </LinearLayout>
+</RelativeLayout>

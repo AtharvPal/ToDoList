@@ -15,6 +15,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -68,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         val adapter = ArrayAdapter<String>(this, R.layout.spinner_item_layout, labels)
         spinner.adapter = adapter
         searchView.maxWidth = 10000
+        searchView.queryHint = "Enter a title to search..."
+
 
 //        item.setOnActionExpandListener(object :MenuItem.OnActionExpandListener{
 //            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
@@ -85,6 +89,19 @@ class MainActivity : AppCompatActivity() {
 //
 //        })
 
+        searchView.setOnQueryTextFocusChangeListener(object:View.OnFocusChangeListener{
+            override fun onFocusChange(v: View?, hasFocus: Boolean) {
+                if(hasFocus==true){
+                    Log.e("search","done 1")
+                    spinner.visibility = View.GONE
+
+                }
+                else {
+                    Log.e("search", "done 2")
+                    spinner.visibility = View.VISIBLE
+                }
+            }
+        })
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Toast.makeText(this@MainActivity, "thir", Toast.LENGTH_SHORT).show()
@@ -92,7 +109,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                    displayTodo(newText)
+                displayTodo(newText)
                 return true
             }
 
@@ -174,7 +191,15 @@ class MainActivity : AppCompatActivity() {
 
     fun openNewTask(view: View) {
         startActivity(Intent(this,TaskActivity::class.java))
+
     }
+
+
+
+
+
+
+
 
 
 
@@ -199,7 +224,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-
+                Log.e("ok4",adapter.getItemId(position).toString())
                 if (direction == ItemTouchHelper.LEFT) {
                     GlobalScope.launch(Dispatchers.IO) {
                         db.todoDao().deleteTask(adapter.getItemId(position))
@@ -229,7 +254,6 @@ class MainActivity : AppCompatActivity() {
                     if (dX > 0) {
 
                         icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_check_white_png)
-
                         paint.color = Color.parseColor("#388E3C")
 
                         canvas.drawRect(

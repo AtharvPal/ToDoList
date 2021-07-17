@@ -27,8 +27,17 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
 
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
         holder.bind(list[position],position)
-        holder.itemView.setOnLongClickListener(object :View.OnLongClickListener{
-            override fun onLongClick(v: View?): Boolean {
+        holder.itemView.share.setOnClickListener {
+            Log.e("share","done")
+            var info = holder.itemView.context.applicationInfo
+            var intent = Intent()
+            intent.action = Intent.ACTION_SEND
+            intent.putExtra(Intent.EXTRA_TEXT,holder.itemView.txtShowTitle.text.toString())
+            intent.type = "text/plain"
+            holder.itemView.context.startActivity(Intent.createChooser(intent,"Share"))
+        }
+        holder.itemView.setOnClickListener(object :View.OnClickListener{
+            override fun onClick(v: View?) {
                 var title = v?.findViewById<TextView>(R.id.txtShowTitle)
                 var desc = v?.findViewById<TextView>(R.id.txtShowTask)
                 var category = v?.findViewById<TextView>(R.id.txtShowCategory)
@@ -43,8 +52,11 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
                 intent.putExtra("date",date?.text.toString())
                 intent.putExtra("time",time?.text.toString())
 
+                intent.putExtra("position",getItemId(position).toInt())
+
+                Log.e("ok",getItemId(position).toString())
+
                 holder.itemView.context.startActivity(intent)
-                return true
             }
         })
 
