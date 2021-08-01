@@ -8,9 +8,9 @@
     android:clickable="true"
     app:cardBackgroundColor="#818181"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="5dp"
     android:elevation="10dp"
-    app:cardCornerRadius="10dp">
+    app:cardCornerRadius="5dp">
 
 <!--    <View-->
 <!--        android:id="@+id/viewColorTag"-->
@@ -30,9 +30,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
         android:background="?android:attr/selectableItemBackground"
-
         android:padding="10dp"
         android:theme="@style/allDetailsTextColor">
 
@@ -46,7 +44,7 @@
             android:layout_toStartOf="@+id/txtShowCategory"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             tools:text="Task Title" />
 
@@ -57,7 +55,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtShowTitle"
             android:layout_alignParentStart="true"
-
             android:layout_marginTop="4dp"
             android:textSize="16sp"
             tools:text="Task Subtitle" />
@@ -67,7 +64,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/spinner_item_background"
             android:padding="4dp"
             android:ellipsize="end"
             android:maxWidth="80dp"
@@ -81,10 +77,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtShowTask"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             android:layout_toLeftOf="@+id/txtShowTime"
             android:layout_marginRight="10dp"
-            android:visibility="visible"
             tools:text="22-12-2017" />
 
 
@@ -94,20 +89,18 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtShowTask"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="30dp"
-            android:fontFamily="@font/montserrat"
-            android:visibility="visible"
+            android:layout_marginTop="20dp"
             tools:text="22:12 AM" />
 
         <ImageButton
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             android:src="@drawable/ic_baseline_share_24"
-            android:tint="@color/green"
             android:id="@+id/share"
             android:background="@android:color/transparent"
-            android:layout_below="@+id/txtShowTask"/>
+            android:layout_below="@+id/txtShowTask"
+            app:tint="@color/white" />
 
     </RelativeLayout>
 

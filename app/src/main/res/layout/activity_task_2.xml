@@ -25,19 +25,9 @@
         android:layout_height="wrap_content"
         app:popupTheme="@style/AppTheme.PopupOverlay">
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:onClick="finishTask"
-            android:scaleX="0.8"
-            android:scaleY="0.8"
-            android:src="@drawable/ic_baseline_arrow_back_ios_24"
-            app:tint="@color/white"/>
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_marginRight="40dp"
             android:layout_height="wrap_content"
             android:text="New Task"
             android:id="@+id/addtask"
@@ -59,8 +49,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="2dp"
         android:text="Title"
         android:textColor="@color/white"
         android:textSize="18sp" />
@@ -69,11 +60,8 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginHorizontal="15dp"
-        android:textSize="14sp"
-        android:maxLength="40"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="15dp"
-        android:background="@drawable/edittext_background"
+        android:textColor="@color/white"
+        android:background="@color/edittext_background"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
         android:id="@+id/titleInpLay"/>
@@ -82,7 +70,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="2dp"
         android:text="What is to be done?"
         android:textColor="@color/white"
         android:textSize="18sp" />
@@ -91,11 +80,8 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginHorizontal="15dp"
-        android:textSize="14sp"
-        android:maxLength="120"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="15dp"
-        android:background="@drawable/edittext_background"
+        android:textColor="@color/white"
+        android:background="@color/edittext_background"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
         android:id="@+id/taskInpLay"/>
@@ -103,7 +89,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="4dp"
         android:text="Set reminder date and time"
         android:textColor="@color/white"
         android:textSize="18sp" />
@@ -112,32 +99,22 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginHorizontal="15dp"
-        android:textSize="14sp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:textColor="@color/white"
         android:drawableRight="@drawable/ic_date_range_black_24dp"
-        android:drawableTint="@color/black"
-        android:cursorVisible="false"
-        android:clickable="true"
-        android:focusable="false"
-        android:background="@drawable/edittext_background"
+        android:drawableTint="@color/white"
+        android:background="@color/edittext_background"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
         android:id="@+id/dateEdt"/>
 
-    <EditText
+     <EditText
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginHorizontal="15dp"
-        android:textSize="14sp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="15dp"
-        android:cursorVisible="false"
-        android:clickable="true"
-        android:focusable="false"
+        android:textColor="@color/white"
         android:drawableRight="@drawable/ic_access_time_black_24dp"
-        android:drawableTint="@color/black"
-        android:background="@drawable/edittext_background"
+        android:drawableTint="@color/white"
+        android:background="@color/edittext_background"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
         android:id="@+id/timeEdt"/>
@@ -147,8 +124,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="4dp"
         android:text="Select category"
         android:textColor="@color/white"
         android:textSize="18sp" />
@@ -156,15 +134,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="5dp"
-        android:clickable="false"
-        android:orientation="horizontal">
+        android:layout_marginEnd="16dp"
+
+        android:orientation="horizontal"
+        android:layout_marginStart="16dp">
 
         <Spinner
-            android:theme="@style/spinner_divider"
             android:id="@+id/spinnerCategory"
-            android:focusable="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -178,11 +154,11 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1" />
-    <androidx.appcompat.widget.AppCompatButton
+    <Button
         android:text="Save Task"
-        android:background="@color/white"
         android:id="@+id/saveBtn"
         android:textColor="@color/black"
+        app:backgroundTint="@color/white"
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

@@ -1,4 +1,4 @@
-package com.example.todolist
+package com.example.todolist2
 
 import android.content.Intent
 import android.util.Log
@@ -79,6 +79,7 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
                 txtShowCategory.text = todoModel.category
                 updateTime(todoModel.time)
                 updateDate(todoModel.date)
+
 
             }
 

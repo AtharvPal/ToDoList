@@ -24,7 +24,7 @@
         android:id="@+id/toolbar"
         android:theme="@style/top"
         app:titleTextColor="@color/white"
-        android:background="@color/gray"
+        android:background="@color/gray_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -42,7 +42,20 @@
         android:layout_margin="32dp"
         android:onClick="openNewTask"
         app:backgroundTint="@color/white"
-        android:src="@drawable/ic_add_white_24dp"
+        app:tint="@color/green"
+        android:src="@drawable/ic_add_white_36dp"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100dp"
+        android:layout_marginRight="32dp"
+        android:onClick="openHistory"
+        app:backgroundTint="@color/white"
+        app:tint="@color/green"
+        android:src="@drawable/ic_baseline_history_24"
         android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

@@ -5,9 +5,8 @@
     android:paddingBottom="14dp"
     android:paddingStart="15dp"
     android:paddingEnd="15dp"
-    android:textColor="@color/black"
-    android:background="@color/white"
-
+    android:textColor="@color/white"
+    android:background="@color/gray_toolbar"
     android:layout_height="wrap_content">
 
 </TextView>

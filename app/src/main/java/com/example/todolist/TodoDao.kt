@@ -1,4 +1,4 @@
-package com.example.todolist
+package com.example.todolist2
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -19,4 +19,13 @@ interface TodoDao {
 
     @Query("Delete from TodoModel where id=:uid")
     fun deleteTask(uid:Long)
+
+    @Query("Select isFinished from TodoModel where id=:uid")
+    fun getFinishedStatus(uid:Long):Int
+
+    @Query("Select * from TodoModel where isFinished == 1")
+    fun getFinishedTasks():LiveData<List<TodoModel>>
+
+    @Query("Update TodoModel Set isFinished = 0 where id=:uid")
+    fun unfinishTask(uid:Long)
 }

@@ -15,6 +15,7 @@
         <!-- Customize your theme here. -->
         <item name="fontFamily">@font/montserrat</item>
         <item name="backgroundColor">@color/black</item>
+        <item name="android:dropDownListViewStyle">@style/spinner_divider</item>
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
@@ -29,7 +30,16 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+<!--    in below,text color changes nothing. Remove the corresponding lines from task.xml to see why-->
+    <style name="CounterAppearance" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 
+    <style name="spinner_divider" parent="Widget.AppCompat.ListView.DropDown">
+        <item name="android:divider">@color/black</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
 
 
 <!--    <style name="naya" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">-->

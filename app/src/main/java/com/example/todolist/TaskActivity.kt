@@ -1,4 +1,4 @@
-package com.example.todolist
+package com.example.todolist2
 
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -67,19 +67,18 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         var position2 = getIntent().getIntExtra("position",-1)
         Log.e("ok2",position2.toString())
 
-//        var imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager   // idk why tf this doesn't work
-//        imm.showSoftInput(titleInpLay,InputMethodManager.SHOW_FORCED)
+
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)   // why do I have to write this?
         if(title2!=null) {
-            title_task.setText(title2.toString())
+            titleInpLay.setText(title2.toString())
             addtask.text = "Edit Task"
             // below is to set cursor position of title at end of the textview
-            title_task.setSelection(title_task.text.toString().length)
+            titleInpLay.setSelection(titleInpLay.text.toString().length)
         }
 
         if(desc2!=null)
-            desc_task.setText(desc2.toString())
-        desc_task.setText(desc2)
+            taskInpLay.setText(desc2.toString())
+        taskInpLay.setText(desc2)
         if(date2!=null)
             updateDate2(date2.toString())
         if(time2!=null)
@@ -90,6 +89,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         var spinner_adapter = spinnerCategory.adapter as ArrayAdapter<String>
         var pos = spinner_adapter.getPosition(category2)
         spinnerCategory.setSelection(pos)
+
 
 
     }
@@ -122,14 +122,17 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             ArrayAdapter<String>(this, R.layout.spinner_item_layout, labels)
 
         spinnerCategory.adapter = adapter
+        spinnerCategory.setPopupBackgroundResource(R.color.black)
+
     }
 
     override fun onClick(v: View) {
 
 //         hide the keyboard if open (as you don't need a keyboard for date or time editing)
         var imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(title_task.windowToken,0)
-        imm.hideSoftInputFromWindow(desc_task.windowToken,0)
+//        imm.hideSoftInputFromWindow(titleInpLay.windowToken,0)
+//        imm.hideSoftInputFromWindow(taskInpLay.windowToken,0)
+        imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         when (v.id) {
             R.id.dateEdt -> {
                 setListener()
@@ -148,15 +151,14 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun saveTodo(position: Int) {
         val category = spinnerCategory.selectedItem.toString()
-        val title = titleInpLay.editText?.text.toString()
-        val description = taskInpLay.editText?.text.toString()
+        val title = titleInpLay.text.toString()
+        val description = taskInpLay.text.toString()
         if (TextUtils.isEmpty(title))
             Toast.makeText(titleInpLay.context,"Please enter a title",Toast.LENGTH_SHORT).show()
         else if(finalDate==0L)
             Toast.makeText(titleInpLay.context,"Please select a date",Toast.LENGTH_SHORT).show()
         else if(finalTime==0L)
             Toast.makeText(titleInpLay.context,"Please select a time",Toast.LENGTH_SHORT).show()
-
 
         else {
             var is_updated = false
@@ -189,6 +191,10 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+
+    fun finishTask(view:View){
+        onBackPressed()
+    }
     private fun setTimeListener() {
         myCalendar = Calendar.getInstance()
 
@@ -242,11 +248,12 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         finalDate = myCalendar.time.time
         dateEdt.setText(sdf.format(myCalendar.time))
 
-        timeInptLay.visibility = View.VISIBLE
+        timeEdt.visibility = View.VISIBLE
 
     }
 
     private fun updateDate2(currDate:String) {
+        // ADD THIS FUNCTION TO A CLASS
         //Mon, 5 Jan 2020
         myCalendar = Calendar.getInstance()
         var n = currDate.length
@@ -278,12 +285,14 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         finalDate = myCalendar.time.time
         dateEdt.setText(sdf.format(myCalendar.time))
 
-        timeInptLay.visibility = View.VISIBLE
+        timeEdt.visibility = View.VISIBLE
 
     }
 
 
     private fun updateTime2(currTime:String) {
+
+        // ADD THIS FUNCTION TO A CLASS
         //Mon, 5 Jan 2020
 
         myCalendar = Calendar.getInstance()

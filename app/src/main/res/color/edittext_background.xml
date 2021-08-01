@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--    below lines set background color of edittext to white when focused-->
+<!--    <item android:color="@color/white" android:state_focused="true"/>-->
+<!--    <item android:color="@color/white2"/>-->
+
+    <item android:color="@color/white"/>
+</selector>

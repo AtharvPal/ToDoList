@@ -7,8 +7,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="white2">#BFBFBF</color>
-    <color name="gray">#202020</color>
+    <color name="white2">#C6C6C6</color>
+    <color name="gray">#404040</color>
+    <color name="gray_toolbar">#252525</color>
 
     <color name="colorPrimary">#4CAF50</color>
     <color name="colorPrimaryDark">#388E3C</color>
