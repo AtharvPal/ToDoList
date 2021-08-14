@@ -84,7 +84,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         if(time2!=null)
             updateTime2(time2.toString())
 
-        // how the fuck people do android dev? it is literally fucking trash
+        // how the heck people do android dev? it is literally trash
 
         var spinner_adapter = spinnerCategory.adapter as ArrayAdapter<String>
         var pos = spinner_adapter.getPosition(category2)
