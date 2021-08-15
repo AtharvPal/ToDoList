@@ -63,9 +63,10 @@
         android:layout_marginTop="20dp"
         android:text="Title"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <EditText
+        android:textCursorDrawable="@drawable/cursor"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginHorizontal="15dp"
@@ -85,9 +86,10 @@
         android:layout_marginHorizontal="15dp"
         android:text="What is to be done?"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <EditText
+        android:textCursorDrawable="@drawable/cursor"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginHorizontal="15dp"
@@ -106,7 +108,7 @@
         android:layout_marginHorizontal="15dp"
         android:text="Set reminder date and time"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <EditText
         android:layout_height="wrap_content"
@@ -151,7 +153,7 @@
         android:layout_marginHorizontal="15dp"
         android:text="Select category"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -170,6 +172,19 @@
 
 
     </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="12dp"
+        android:text="New List"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@drawable/edittext_background"
+        android:onClick="addNewCategory"
+
+        android:layout_marginTop="5dp"/>
 
     <!--    the below view is just to push the button to the bottom of the -->
     <!--    screen. It doesn't serve any purpose whatsoever. If you want to -->

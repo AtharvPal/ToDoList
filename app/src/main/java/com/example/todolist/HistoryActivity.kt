@@ -27,7 +27,14 @@ class HistoryActivity : AppCompatActivity() {
         AppDatabase.getDatabase(this)
     }
 
+
+    override fun onPause() {
+        overridePendingTransition(R.anim.fadein,R.anim.fadeout)
+        super.onPause()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        overridePendingTransition(R.anim.fadein,R.anim.fadeout)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
 
@@ -41,10 +48,14 @@ class HistoryActivity : AppCompatActivity() {
             if (!it.isNullOrEmpty())
                 list.addAll(it)
             adapter.notifyDataSetChanged()
-            if (list.isEmpty())
+            if (list.isEmpty()) {
                 emptyListHistory.visibility = View.VISIBLE
-            else
+                not_found_anim_history.visibility = View.VISIBLE
+            }
+            else {
                 emptyListHistory.visibility = View.GONE
+                not_found_anim_history.visibility = View.GONE
+            }
         })
 
         initSwipe()

@@ -14,10 +14,12 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.room.Room
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_task.*
+import kotlinx.android.synthetic.main.add_category_dialog.*
 import kotlinx.android.synthetic.main.dialog_layout.*
 import kotlinx.android.synthetic.main.item_todo.*
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +43,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     var finalTime = 0L
 
 
-    private val labels = arrayListOf("Personal", "Business", "Insurance", "Shopping", "Banking","Other")
+//    private val labels = arrayListOf("Personal", "Business", "Insurance", "Shopping", "Banking","Other")
     private val months = arrayListOf("Jan", "Feb", "Mar", "Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
 
 
@@ -49,8 +51,13 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         AppDatabase.getDatabase(this)
     }
 
+    override fun onPause() {
+        overridePendingTransition(R.anim.fadein,R.anim.fadeout)
+        super.onPause()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        overridePendingTransition(R.anim.fadein,R.anim.fadeout)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task)
         setUpSpinner()
@@ -93,6 +100,29 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
 
     }
+
+    fun addNewCategory(v:View){
+        var dialog = Dialog(titleInpLay.context)
+        dialog.setContentView(R.layout.add_category_dialog)
+        dialog.show()
+        var new_category_ok = dialog.findViewById<Button>(R.id.new_category_ok)
+        var new_category_cancel = dialog.findViewById<Button>(R.id.new_category_cancel)
+        var new_category_name = dialog.findViewById<EditText>(R.id.new_category_name)
+//        new_category_ok.isEnabled = false
+        new_category_name.addTextChangedListener {
+            Log.e("len",new_category_name.text.length.toString())
+            new_category_ok.isEnabled = new_category_name.text.isNotEmpty()
+        }
+        new_category_cancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        new_category_ok.setOnClickListener {
+            var new_cat = new_category_name.text.toString()
+            labels.add(new_cat)
+            dialog.dismiss()
+        }
+    }
+
 
     override fun onBackPressed() {
         var dialog = Dialog(titleInpLay.context)
@@ -195,6 +225,10 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     fun finishTask(view:View){
         onBackPressed()
     }
+
+
+
+
     private fun setTimeListener() {
         myCalendar = Calendar.getInstance()
 
@@ -237,7 +271,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             this, dateSetListener, myCalendar.get(Calendar.YEAR),
             myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)
         )
-        datePickerDialog.datePicker.minDate = System.currentTimeMillis()
+//        datePickerDialog.datePicker.minDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
 
@@ -247,8 +281,6 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val sdf = SimpleDateFormat(myformat)
         finalDate = myCalendar.time.time
         dateEdt.setText(sdf.format(myCalendar.time))
-
-        timeEdt.visibility = View.VISIBLE
 
     }
 

@@ -1,5 +1,6 @@
 package com.example.todolist2
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -18,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main2.*
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.item_todo.*
 import kotlinx.android.synthetic.main.item_todo.view.*
@@ -28,14 +30,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity() {
+var labels =
+    arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
+
+class MainActivity2 : AppCompatActivity() {
 
     var list = arrayListOf<TodoModel>()
     var adapter = TodoAdapter(list)
 
-    private val labels =
-        arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
+//    private val labels =
+//        arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
 
     val db by lazy {
         AppDatabase.getDatabase(this)
@@ -48,11 +54,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         overridePendingTransition(R.anim.fadein,R.anim.fadeout)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main2)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         todoRv.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = this@MainActivity.adapter
+            layoutManager = LinearLayoutManager(this@MainActivity2)
+            adapter = this@MainActivity2.adapter
         }
 
         initSwipe()
@@ -64,62 +71,39 @@ class MainActivity : AppCompatActivity() {
             if (!it.isNullOrEmpty())
                 list.addAll(it)
             adapter.notifyDataSetChanged()
-            if (list.isEmpty())
+            if (list.isEmpty()) {
                 emptyList.visibility = View.VISIBLE
-            else
+                not_found_anim.visibility = View.VISIBLE
+            }
+            else {
                 emptyList.visibility = View.GONE
+                not_found_anim.visibility = View.GONE
+            }
         })
 
-
+        setTheSpinner()
+        setTheSearchBar()
     }
 
-
-
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        val item = menu.findItem(R.id.search)
-        val searchView = item.actionView as SearchView
-        val item2 = menu.findItem(R.id.categories)
-        val spinner = item2.actionView as Spinner
-        val adapter = ArrayAdapter<String>(this, R.layout.spinner_item_layout_main, labels)
-        spinner.adapter = adapter
-        searchView.maxWidth = 10000
+    private fun setTheSearchBar() {
         searchView.queryHint = "Enter a title to search..."
-
-
-//        item.setOnActionExpandListener(object :MenuItem.OnActionExpandListener{
-//            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-//                displayTodo()
-//                Toast.makeText(this@MainActivity,"first",Toast.LENGTH_SHORT).show()
-//                return true
-//            }
-//
-//            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-//                displayTodo()
-//                Toast.makeText(this@MainActivity,"second",Toast.LENGTH_SHORT).show()
-//                return true
-//            }
-//
-//
-//        })
-
         searchView.setOnQueryTextFocusChangeListener(object:View.OnFocusChangeListener{
             override fun onFocusChange(v: View?, hasFocus: Boolean) {
                 if(hasFocus==true){
                     Log.e("search","done 1")
                     spinner.visibility = View.GONE
+                    searchView.maxWidth = 1000
 
                 }
                 else {
                     Log.e("search", "done 2")
-                    spinner.visibility = View.VISIBLE
+//                    spinner.visibility = View.VISIBLE
                 }
             }
         })
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Toast.makeText(this@MainActivity, "thir", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity2, "thir", Toast.LENGTH_SHORT).show()
                 return false
             }
 
@@ -133,15 +117,36 @@ class MainActivity : AppCompatActivity() {
         searchView.setOnCloseListener(object : SearchView.OnCloseListener {
             override fun onClose(): Boolean {
                 displayTodo()
+                spinner.visibility = View.VISIBLE
                 return false
             }
 
         })
+    }
 
+    private fun setTheSpinner() {
+        val adap:ArrayAdapter<String> = object: ArrayAdapter<String>(this, R.layout.spinner_item_layout_main, labels){
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                val v = super.getDropDownView(position, convertView, parent)
+                var selected = v as TextView
+                if (position == spinner.selectedItemPosition){
+                    v.setBackgroundColor(getColor(R.color.white))
+                    selected.setTextColor(Color.BLACK)
+                }
 
-
-
-
+                else
+                {
+                    v.setBackgroundColor(getColor(R.color.gray))
+                    selected.setTextColor(Color.WHITE)
+                }
+                return v
+            }
+        }
+        spinner.adapter = adap
         spinner.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {    // idk why tf this has to be done like this
             override fun onItemSelected(
@@ -154,11 +159,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {    // is this ever called ????
-                Toast.makeText(this@MainActivity, "nothing", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity2, "nothing", Toast.LENGTH_SHORT).show()
             }
         }
-        return super.onCreateOptionsMenu(menu)
+
     }
+
+
+
+
 
     fun displayTodo(newText: String = "") {
         db.todoDao().getTask().observe(this, Observer {
@@ -176,9 +185,15 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
             if (list.isEmpty())
+            {
                 emptyList.visibility = View.VISIBLE
+                not_found_anim.visibility = View.VISIBLE
+            }
             else
+            {
                 emptyList.visibility = View.GONE
+                not_found_anim.visibility = View.GONE
+            }
         })
     }
 
@@ -198,9 +213,15 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
             if (list.isEmpty())
+            {
                 emptyList.visibility = View.VISIBLE
+                not_found_anim.visibility = View.VISIBLE
+            }
             else
+            {
                 emptyList.visibility = View.GONE
+                not_found_anim.visibility = View.GONE
+            }
         })
     }
 
@@ -468,6 +489,8 @@ class MainActivity : AppCompatActivity() {
         val myformat = "h:mm a"
         val sdf = SimpleDateFormat(myformat)
         finalTime = myCalendar.time.time
+        Log.e("time 1",finalTime.toString())
+        Log.e("time 2",System.currentTimeMillis().toString())
         return finalTime
 
     }

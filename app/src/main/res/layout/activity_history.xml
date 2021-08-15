@@ -9,16 +9,29 @@
     tools:context=".MainActivity">
 
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="200dp"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:id="@+id/not_found_anim_history"
+        tools:visibility="visible"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/not_found"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No items"
-        android:textSize="30sp"
+        android:text="Nothing to show"
+        android:textSize="16sp"
         android:textColor="@color/white"
-        android:layout_centerInParent="true"
+        android:layout_below="@+id/not_found_anim_history"
+        android:layout_centerHorizontal="true"
         android:visibility="gone"
-        android:id="@+id/emptyListHistory"
-        android:layout_centerVertical="true"/>
+        tools:visibility="visible"
+        android:id="@+id/emptyListHistory" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/historyToolbar"
