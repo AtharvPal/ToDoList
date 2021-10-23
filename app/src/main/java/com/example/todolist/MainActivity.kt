@@ -253,13 +253,6 @@ class MainActivity : AppCompatActivity() {
 //                Log.e("gg",adapter.getItemId(position).toString())
 //                Log.e("gg",v.toString())
 
-                // because I need the finished status of to do being deleted so that I can restore it in case of undo
-                var deleted_todo_finished_status:Int=0
-
-                // getting the finished status of to-do being deleted
-                GlobalScope.launch(Dispatchers.IO) {
-                    deleted_todo_finished_status = db.todoDao().getFinishedStatus(adapter.getItemId(position))
-                }
 
                 // saving the view to-be-deleted in a variable
                 var restored_view = viewHolder.itemView
@@ -271,7 +264,7 @@ class MainActivity : AppCompatActivity() {
                     restored_view.txtShowTask.text.toString(),
                     restored_view.txtShowCategory.text.toString(),
                     updateDate3(restored_view.txtShowDate.text.toString()),
-                    updateTime3(restored_view.txtShowTime.text.toString()),deleted_todo_finished_status,id)
+                    updateTime3(restored_view.txtShowTime.text.toString()),0,id)
                 if (direction == ItemTouchHelper.LEFT) {
 
                     GlobalScope.launch(Dispatchers.IO) {
@@ -290,7 +283,7 @@ class MainActivity : AppCompatActivity() {
                                 )
                             }
                         }
-                        adapter.notifyDataSetChanged()
+//                        adapter.notifyDataSetChanged()
 
 //                        Log.e("gg2",position.toString())
 //                        list.add(position,restored_model)
@@ -471,5 +464,6 @@ class MainActivity : AppCompatActivity() {
         return finalTime
 
     }
+
 
 }

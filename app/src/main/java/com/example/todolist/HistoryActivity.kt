@@ -28,13 +28,8 @@ class HistoryActivity : AppCompatActivity() {
     }
 
 
-    override fun onPause() {
-        overridePendingTransition(R.anim.fadein,R.anim.fadeout)
-        super.onPause()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        overridePendingTransition(R.anim.fadein,R.anim.fadeout)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
 
@@ -129,9 +124,13 @@ class HistoryActivity : AppCompatActivity() {
                         icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_check_white_png)
                         paint.color = Color.parseColor("#388E3C")
 
+//                        canvas.drawRect(
+//                            itemView.left.toFloat(), itemView.top.toFloat(),
+//                            itemView.left.toFloat() + dX, itemView.bottom.toFloat(), paint
+//                        )
                         canvas.drawRect(
                             itemView.left.toFloat(), itemView.top.toFloat(),
-                            itemView.left.toFloat() + dX, itemView.bottom.toFloat(), paint
+                            itemView.right.toFloat(), itemView.bottom.toFloat(), paint
                         )
 
                         canvas.drawBitmap(
@@ -142,13 +141,17 @@ class HistoryActivity : AppCompatActivity() {
                         )
 
 
-                    } else {
+                    } else if(dX<0){
                         icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_delete_white_png)
 
                         paint.color = Color.parseColor("#D32F2F")
 
+//                        canvas.drawRect(
+//                            itemView.right.toFloat() + dX, itemView.top.toFloat(),
+//                            itemView.right.toFloat(), itemView.bottom.toFloat(), paint
+//                        )
                         canvas.drawRect(
-                            itemView.right.toFloat() + dX, itemView.top.toFloat(),
+                            itemView.left.toFloat(), itemView.top.toFloat(),
                             itemView.right.toFloat(), itemView.bottom.toFloat(), paint
                         )
 
@@ -159,6 +162,15 @@ class HistoryActivity : AppCompatActivity() {
                             paint
                         )
                     }
+                    else{
+                        paint.color = getColor(R.color.black)
+
+                        canvas.drawRect(
+                            itemView.left.toFloat(), itemView.top.toFloat(),
+                            itemView.right.toFloat(), itemView.bottom.toFloat(), paint
+                        )
+                    }
+
                     viewHolder.itemView.translationX = dX
 
 

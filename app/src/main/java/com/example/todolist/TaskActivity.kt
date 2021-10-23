@@ -10,25 +10,26 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Observer
 import androidx.room.Room
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main2.*
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.add_category_dialog.*
 import kotlinx.android.synthetic.main.dialog_layout.*
 import kotlinx.android.synthetic.main.item_todo.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.text.FieldPosition
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 const val DB_NAME = "todo.db"
 
@@ -44,11 +45,16 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
 
 //    private val labels = arrayListOf("Personal", "Business", "Insurance", "Shopping", "Banking","Other")
+    private val per_labels = arrayListOf("Personal", "Business", "Insurance", "Shopping", "Banking","Other")
     private val months = arrayListOf("Jan", "Feb", "Mar", "Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
 
 
     val db by lazy {
         AppDatabase.getDatabase(this)
+    }
+
+    val db2 by lazy {
+        CategoryDatabase.getDatabase(this)
     }
 
     override fun onPause() {
@@ -60,7 +66,9 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         overridePendingTransition(R.anim.fadein,R.anim.fadeout)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task)
+
         setUpSpinner()
+
         titleInpLay.requestFocus()   // to set the initial focus to title edit text view
         dateEdt.setOnClickListener(this)
         timeEdt.setOnClickListener(this)
@@ -75,31 +83,45 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         Log.e("ok2",position2.toString())
 
 
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)   // why do I have to write this?
         if(title2!=null) {
             titleInpLay.setText(title2.toString())
             addtask.text = "Edit Task"
             // below is to set cursor position of title at end of the textview
             titleInpLay.setSelection(titleInpLay.text.toString().length)
         }
+        var defaultDate:String
+        var defaultTime:String
+        val myformat = "h:mm a"
+        val sdf = SimpleDateFormat(myformat)
+        defaultTime=sdf.format(System.currentTimeMillis())
+
+        val myformat1 = "EEE, d MMM yyyy"
+        val sdf1 = SimpleDateFormat(myformat1)
+        defaultDate=sdf1.format(System.currentTimeMillis())
+        Log.e("defult",defaultDate + " " + defaultTime)
 
         if(desc2!=null)
             taskInpLay.setText(desc2.toString())
         taskInpLay.setText(desc2)
         if(date2!=null)
             updateDate2(date2.toString())
+        else
+            updateDate2(defaultDate)
         if(time2!=null)
             updateTime2(time2.toString())
+        else
+            updateTime2(defaultTime)
 
         // how the heck people do android dev? it is literally trash
 
         var spinner_adapter = spinnerCategory.adapter as ArrayAdapter<String>
         var pos = spinner_adapter.getPosition(category2)
-        spinnerCategory.setSelection(pos)
-
+        spinnerCategory.setSelection(Math.max(0,pos))
+        Log.e("spinner selected item 4",spinnerCategory.selectedItemPosition.toString())
 
 
     }
+
 
     fun addNewCategory(v:View){
         var dialog = Dialog(titleInpLay.context)
@@ -108,18 +130,70 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         var new_category_ok = dialog.findViewById<Button>(R.id.new_category_ok)
         var new_category_cancel = dialog.findViewById<Button>(R.id.new_category_cancel)
         var new_category_name = dialog.findViewById<EditText>(R.id.new_category_name)
-//        new_category_ok.isEnabled = false
+        new_category_ok.isEnabled = false
+        new_category_ok.setTextColor(getColor(R.color.gray))
         new_category_name.addTextChangedListener {
-            Log.e("len",new_category_name.text.length.toString())
-            new_category_ok.isEnabled = new_category_name.text.isNotEmpty()
+            var input = new_category_name.text.toString()
+            // input.trim() doesn't work for input with multiple spaces eg "    " (4 spaces)
+            input = input.trim()
+            Log.e("len",input.length.toString())
+            new_category_ok.isEnabled = !input.isBlank()
+            if(new_category_ok.isEnabled)
+                new_category_ok.setTextColor(getColor(R.color.green))
+            else
+                new_category_ok.setTextColor(getColor(R.color.gray))
         }
         new_category_cancel.setOnClickListener {
             dialog.dismiss()
         }
         new_category_ok.setOnClickListener {
             var new_cat = new_category_name.text.toString()
-            labels.add(new_cat)
-            dialog.dismiss()
+            new_cat.trim()
+            Log.e("new ",new_cat)
+            var already = false
+//            runBlocking {
+//                GlobalScope.launch {
+//                    if ( new_cat in db2.categoryDao().getCategories2())
+//                        already = true
+//                }
+//            }
+
+//            GlobalScope.launch(Dispatchers.Main){
+//                val id = withContext(Dispatchers.IO) {
+//                    if(new_cat in db2.categoryDao().getCategories2())
+//                        already = true
+//                }
+//            }
+            runBlocking {
+                launch(Dispatchers.IO) {
+                    if(new_cat in db2.categoryDao().getCategories2())
+                        already = true
+                }
+            }
+            if (already){
+                var imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                Log.e("already",new_cat + " exists")
+                var snack = Snackbar.make(titleInpLay,"Category already exists!",Snackbar.LENGTH_SHORT)
+                snack.show()
+                dialog.dismiss()
+            }
+            else{
+                GlobalScope.launch(Dispatchers.Main){
+                    val id = withContext(Dispatchers.IO) {
+                        return@withContext db2.categoryDao().insertCategory(
+                            CategoryModel(
+                                new_cat
+                            )
+                        )
+                    }
+                }
+                var adap = spinnerCategory.adapter as ArrayAdapter<String>
+                adap.add(new_cat)
+                adap.notifyDataSetChanged()
+                dialog.dismiss()
+            }
+
         }
     }
 
@@ -127,6 +201,9 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     override fun onBackPressed() {
         var dialog = Dialog(titleInpLay.context)
         dialog.setContentView(R.layout.dialog_layout)
+        val w = resources.displayMetrics.widthPixels*0.9   // to occupy 90% of screen's width
+//        val h = resources.displayMetrics.heightPixels*0.9   // to occupy 90% of screen's height
+        dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog.show()
         var dialog_text = "Discard To Do?"
 
@@ -144,15 +221,48 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             dialog.dismiss()
         }
         yes_button.setOnClickListener {
+            dialog.dismiss()
             finish()
         }
     }
     private fun setUpSpinner() {
-        val adapter =
-            ArrayAdapter<String>(this, R.layout.spinner_item_layout, labels)
+        var databaseLabels:MutableList<String> = per_labels
 
-        spinnerCategory.adapter = adapter
+        runBlocking {
+            GlobalScope.launch {
+                Log.e("thread 2",Thread.currentThread().name)
+                databaseLabels.addAll(db2.categoryDao().getCategories2())
+            }
+            Log.e("thread",Thread.currentThread().name)
+
+        }
+
+        val adap:ArrayAdapter<String> = object: ArrayAdapter<String>(this, R.layout.spinner_item_layout, databaseLabels){
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                val v = super.getDropDownView(position, convertView, parent)
+                var selected = v as TextView
+                if (position == spinnerCategory.selectedItemPosition){
+                    v.setBackgroundColor(getColor(R.color.white))
+                    selected.setTextColor(getColor(R.color.gray_toolbar))
+                }
+
+                else
+                {
+                    v.setBackgroundColor(getColor(R.color.gray))
+                    selected.setTextColor(Color.WHITE)
+                }
+                return v
+            }
+        }
+        spinnerCategory.adapter = adap
+
         spinnerCategory.setPopupBackgroundResource(R.color.black)
+
+
 
     }
 
@@ -198,7 +308,23 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
                     db.todoDao().deleteTask(position.toLong())
                 }
             }
-
+//            val myFormat = "EEE, d MMM yyyy h:mm a"
+//            val sdf = SimpleDateFormat(myFormat)
+//            val myFormat1 = "EEE, d MMM yyyy"
+//            val sdf1 = SimpleDateFormat(myFormat1)
+//            val myFormat2 = "h:mm a"
+//            val sdf2 = SimpleDateFormat(myFormat2)
+//            val currentDateTime = sdf.format(Date(System.currentTimeMillis()))
+//            Log.e("compare 1","${sdf.format(Date(myCalendar.timeInMillis))}: ${currentDateTime} and ${myCalendar.timeInMillis}: ${System.currentTimeMillis()}")
+//            Log.e("compare 2","${sdf.format(Date(finalDate))} and ${sdf.format(Date(finalTime))}")
+//            Log.e("compare 3","${sdf1.format(Date(finalDate))} and ${sdf2.format(Date(finalTime))}")
+//            val combinedDateTime = sdf1.format(finalDate)+" "+ sdf2.format(finalTime)
+//            if (sdf.parse(combinedDateTime).before(sdf.parse(currentDateTime)))
+//                Log.e("compare 4"," ${combinedDateTime} is befiore ${currentDateTime}")
+//            else if(sdf.parse(combinedDateTime).after(sdf.parse(currentDateTime)))
+//                Log.e("compare 4"," ${combinedDateTime} is after ${currentDateTime}")
+//            else
+//                Log.e("compare 4"," ${combinedDateTime} is equal to ${currentDateTime}")
             GlobalScope.launch(Dispatchers.Main){
                 val id = withContext(Dispatchers.IO) {
                     return@withContext db.todoDao().insertTask(
@@ -243,6 +369,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             this, timeSetListener, myCalendar.get(Calendar.HOUR_OF_DAY),
             myCalendar.get(Calendar.MINUTE), false
         )
+
         timePickerDialog.show()
     }
 

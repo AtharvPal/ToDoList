@@ -1,12 +1,15 @@
 package com.example.todolist2
 
 import android.content.Intent
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
@@ -32,7 +35,17 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
             var info = holder.itemView.context.applicationInfo
             var intent = Intent()
             intent.action = Intent.ACTION_SEND
-            intent.putExtra(Intent.EXTRA_TEXT,holder.itemView.txtShowTitle.text.toString())
+
+            var todoData = ""
+            todoData+="Title: "+holder.itemView.txtShowTitle.text.toString()
+            if (!holder.itemView.txtShowTask.text.isBlank())
+                todoData+="\nDescription: "+holder.itemView.txtShowTask.text.toString()
+            todoData+="\nDate: "+holder.itemView.txtShowDate.text.toString()
+            todoData+="\nTime: "+holder.itemView.txtShowTime.text.toString()
+            todoData+="\nCategory: "+holder.itemView.txtShowCategory.text.toString()
+            Log.e("Share data",todoData)
+            
+            intent.putExtra(Intent.EXTRA_TEXT,todoData)
             intent.type = "text/plain"
             holder.itemView.context.startActivity(Intent.createChooser(intent,"Share"))
         }
@@ -79,7 +92,30 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
                 txtShowCategory.text = todoModel.category
                 updateTime(todoModel.time)
                 updateDate(todoModel.date)
+//                itemView.animation = AnimationUtils.loadAnimation(itemView.context,R.anim.fall_down)
 
+                val myFormat = "EEE, d MMM yyyy h:mm a"
+                val sdf = SimpleDateFormat(myFormat)
+                val myFormat1 = "EEE, d MMM yyyy"
+                val sdf1 = SimpleDateFormat(myFormat1)
+                val myFormat2 = "h:mm a"
+                val sdf2 = SimpleDateFormat(myFormat2)
+                val currentDateTime = sdf.format(Date(System.currentTimeMillis()))
+//            Log.e("compare 1","${sdf.format(Date(myCalendar.timeInMillis))}: ${currentDateTime} and ${myCalendar.timeInMillis}: ${System.currentTimeMillis()}")
+//            Log.e("compare 2","${sdf.format(Date(finalDate))} and ${sdf.format(Date(finalTime))}")
+//            Log.e("compare 3","${sdf1.format(Date(finalDate))} and ${sdf2.format(Date(finalTime))}")
+                val combinedDateTime = sdf1.format(todoModel.date)+" "+ sdf2.format(todoModel.time)
+                if (sdf.parse(combinedDateTime).before(sdf.parse(currentDateTime))) {
+                    txtShowDate.setTextColor(ContextCompat.getColor(itemView.context,R.color.red_delete))  // complex way :(
+                    txtShowTime.setTextColor(ContextCompat.getColor(itemView.context,R.color.red_delete))
+                    Log.e("compare 4", " ${combinedDateTime} is before ${currentDateTime}")
+                }
+                else{
+                    txtShowDate.setTextColor(Color.WHITE)
+                    txtShowTime.setTextColor(Color.WHITE)
+                    Log.e("compare 4"," ${combinedDateTime} is equal to or after ${currentDateTime}")
+
+                }
 
             }
 

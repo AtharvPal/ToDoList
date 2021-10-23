@@ -3,17 +3,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/drawable/button_background.xml" value="0.2703125" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/drawable/cursor.xml" value="0.2703125" />
+        <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/drawable/ic_playlist_add_black_24dp.xml" value="0.2703125" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/drawable/searchview_background.xml" value="0.2703125" />
+        <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/drawable/spinner_item_background.xml" value="0.2703125" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/drawable/spinner_selected_background.xml" value="0.1390625" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/activity_history.xml" value="0.19519927536231885" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/activity_main.xml" value="0.1490036231884058" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/activity_main2.xml" value="0.1490036231884058" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/activity_splash_screen.xml" value="0.25416666666666665" />
-        <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/activity_task.xml" value="0.2" />
+        <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/activity_task.xml" value="0.25" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/add_category_dialog.xml" value="0.25416666666666665" />
+        <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/delete_category_layout.xml" value="0.2" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/dialog_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/item_todo.xml" value="0.19519927536231885" />
+        <entry key="..\:/AndroidDevelopment/ToDoList2/app/src/main/res/layout/spinner_item_layout_main.xml" value="0.1" />
       </map>
     </option>
   </component>
