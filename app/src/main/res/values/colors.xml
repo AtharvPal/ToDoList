@@ -9,7 +9,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="white2">#C6C6C6</color>
     <color name="gray">#404040</color>
-    <color name="gray_toolbar">#252525</color>
+    <color name="gray_toolbar">#171717</color>
+    <color name="gray_toolbar_light">#323232</color>
+    <color name="red_delete">#D32F2F</color>
 
     <color name="colorPrimary">#4CAF50</color>
     <color name="colorPrimaryDark">#388E3C</color>

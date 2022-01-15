@@ -13,18 +13,18 @@
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:id="@+id/discard"
+            android:id="@+id/delete_category"
             android:paddingBottom="15dp"
             android:paddingTop="20dp"
             android:paddingHorizontal="30dp"
-            android:text="Discard?"
+            android:text="Delete"
             android:textAlignment="center"
             android:textSize="16sp"
             android:textColor="@color/white"/>
-<!--        needed to use material button because I could'nt figure out-->
-<!--        a way to remove padding/space around the text inside button-->
+        <!--        needed to use material button because I could'nt figure out-->
+        <!--        a way to remove padding/space around the text inside button-->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/yes_button"
+            android:id="@+id/yes_button_delete"
             android:layout_width="match_parent"
             android:layout_height="34dp"
             android:layout_marginHorizontal="10dp"
@@ -38,7 +38,7 @@
             tools:ignore="TouchTargetSizeCheck" />
 
         <Button
-            android:id="@+id/cancel_button"
+            android:id="@+id/cancel_button_delete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
