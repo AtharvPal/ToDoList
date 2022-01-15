@@ -48,6 +48,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     private val per_labels = arrayListOf("Personal", "Business", "Insurance", "Shopping", "Banking","Other")
     private val months = arrayListOf("Jan", "Feb", "Mar", "Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
 
+    lateinit var date3:String
+    lateinit var time3:String
 
     val db by lazy {
         AppDatabase.getDatabase(this)
@@ -83,6 +85,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         Log.e("ok2",position2.toString())
 
 
+
         if(title2!=null) {
             titleInpLay.setText(title2.toString())
             addtask.text = "Edit Task"
@@ -111,6 +114,9 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             updateTime2(time2.toString())
         else
             updateTime2(defaultTime)
+
+        date3 = if (date2==null) defaultDate else date2
+        time3 = if (time2==null) defaultTime else time2
 
         // how the heck people do android dev? it is literally trash
 
@@ -358,6 +364,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     private fun setTimeListener() {
         myCalendar = Calendar.getInstance()
 
+        updateTime2(time3)
+
         timeSetListener =
             TimePickerDialog.OnTimeSetListener() { _: TimePicker, hourOfDay: Int, min: Int ->
                 myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
@@ -384,6 +392,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun setListener() {
         myCalendar = Calendar.getInstance()
+
+        updateDate2(date3)
 
         dateSetListener =
             DatePickerDialog.OnDateSetListener { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
@@ -481,4 +491,6 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         timeEdt.setText(sdf.format(myCalendar.time))
 
     }
+
+
 }
