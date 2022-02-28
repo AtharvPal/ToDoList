@@ -313,7 +313,7 @@ class MainActivity2 : AppCompatActivity() {
                 else {
                     list.addAll(
                         it.filter { todo ->
-                            todo.category.contains(newText, true)
+                            todo.category.equals(newText, false)
                         }
                     )
                 }
@@ -434,6 +434,7 @@ class MainActivity2 : AppCompatActivity() {
                     }
                     Snackbar.make(toolbar,"To Do finished",Snackbar.LENGTH_SHORT).show()
                 }
+                displayTodo2(restored_view.txtShowCategory.text.toString())
             }
 
             override fun onChildDraw(
