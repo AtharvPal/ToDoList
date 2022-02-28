@@ -8,7 +8,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -18,9 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main2.*
-import kotlinx.android.synthetic.main.activity_task.*
-import kotlinx.android.synthetic.main.delete_category_layout.*
-import kotlinx.android.synthetic.main.item_todo.*
 import kotlinx.android.synthetic.main.item_todo.view.*
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -33,8 +29,6 @@ class MainActivity2 : AppCompatActivity() {
     var list = arrayListOf<TodoModel>()
     var adapter = TodoAdapter(list)
 
-//    private val labels =
-//        arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
     private val per_labels = arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
     var labels = arrayListOf<String>()
 
@@ -56,7 +50,6 @@ class MainActivity2 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
         setSupportActionBar(toolbar)
-        Log.e("wow 1","1")
         supportActionBar?.setDisplayShowTitleEnabled(false)
         todoRv.apply {
             layoutManager = LinearLayoutManager(this@MainActivity2)
@@ -65,9 +58,7 @@ class MainActivity2 : AppCompatActivity() {
         todoRv.scheduleLayoutAnimation()
         initSwipe()
 
-        Log.e("wow 2","2")
         db.todoDao().getTask().observe(this, Observer {
-            Log.e("wow 3","3")
             list.clear()
             if (!it.isNullOrEmpty())
                 list.addAll(it)
@@ -80,10 +71,7 @@ class MainActivity2 : AppCompatActivity() {
                 emptyList.visibility = View.GONE
                 not_found_anim.visibility = View.GONE
             }
-            Log.e("wow 4","4")
         })
-        Log.e("wow 5","5")
-//        setTheSpinner()
         setTheSearchBar()
     }
 
@@ -93,27 +81,20 @@ class MainActivity2 : AppCompatActivity() {
         // setOnSearchListener is when user clicks on the search icon, it should by default show all the todos
         searchView_toolbar.setOnSearchClickListener {
             displayTodo2(labels[0])
-            Log.e("saarch","clck")
         }
         searchView_toolbar.setOnQueryTextFocusChangeListener(object:View.OnFocusChangeListener{
             override fun onFocusChange(v: View?, hasFocus: Boolean) {
                 if(hasFocus){
-                    Log.e("search","done 1")
                     spinner_toolbar.visibility = View.GONE
                     delete_toolbar.visibility = View.GONE
                     searchView_toolbar.maxWidth = 1000
                     toolbar.setBackgroundColor(getColor(R.color.black))
 
                 }
-                else {
-                    Log.e("search", "done 2")
-//                    spinner.visibility = View.VISIBLE
-                }
             }
         })
         searchView_toolbar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Toast.makeText(this@MainActivity2, "thir", Toast.LENGTH_SHORT).show()
                 return false
             }
 
@@ -139,18 +120,11 @@ class MainActivity2 : AppCompatActivity() {
         })
     }
 
-    fun printCat(l:MutableList<String>){
-        for(x in l)
-            Log.e(";abels",x)
-        Log.e(";lala","   ")
-    }
-
     fun deleteCategory(v:View){
         val cat = spinner_toolbar.selectedItem as String
         var dialog = Dialog(this)
         dialog.setContentView(R.layout.delete_category_layout)
         val w = resources.displayMetrics.widthPixels*0.9   // to occupy 90% of screen's width
-//        val h = resources.displayMetrics.heightPixels*0.9   // to occupy 90% of screen's height
         dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog.show()
         var delete_category = dialog.findViewById<TextView>(R.id.delete_category)
@@ -194,33 +168,14 @@ class MainActivity2 : AppCompatActivity() {
 
         var databaseLabels:MutableList<String> = per_labels
 
-//        runBlocking {
-//            GlobalScope.launch {
-//                Log.e("thread 2",Thread.currentThread().name)
-//                databaseLabels.addAll(db2.categoryDao().getCategories2())
-//            }
-//            Log.e("thread",Thread.currentThread().name)
-//            for(x in databaseLabels)
-//                Log.e(";abels",x)
-//        }
-
-        printCat(databaseLabels)
         runBlocking {
             launch(Dispatchers.IO) {
                 val per_labels2 = arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
-                printCat(databaseLabels)
                 databaseLabels.clear()
-                printCat(databaseLabels)
-                Log.e(";len",per_labels2.size.toString())
-                Log.e(";thread",Thread.currentThread().name)
                 databaseLabels.addAll(per_labels2)
-                printCat(databaseLabels)
                 databaseLabels.addAll(db2.categoryDao().getCategories2())
-                printCat(databaseLabels)
             }
         }
-
-        printCat(databaseLabels)
 
         labels = databaseLabels as ArrayList<String>
         val adap:ArrayAdapter<String> = object: ArrayAdapter<String>(this, R.layout.spinner_item_layout_main, labels){
@@ -255,7 +210,6 @@ class MainActivity2 : AppCompatActivity() {
                 id: Long
             ) {
                 displayTodo2(labels[position])
-                Log.e("visisble",position.toString() + " " + per_labels.size.toString())
                 val per_labels2 = arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
                 if(position>=per_labels2.size){
                     delete_toolbar.visibility = View.VISIBLE
@@ -266,15 +220,10 @@ class MainActivity2 : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {    // is this ever called ????
-                Toast.makeText(this@MainActivity2, "nothing", Toast.LENGTH_SHORT).show()
             }
         }
 
     }
-
-
-
-
 
     fun displayTodo(newText: String = "") {
         db.todoDao().getTask().observe(this, Observer {
@@ -374,19 +323,14 @@ class MainActivity2 : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-//                Log.e("gg",position.toString())
 
                 // I need the id (Primary Key) of the to-do because in case user decides to undo the delete operation,
                 // the Primary Key is needed to restore the to-do in the same place as before
 
                 var id = adapter.getItemId(position)
-//                Log.e("gg",adapter.getItemId(position).toString())
-//                Log.e("gg",v.toString())
-
 
                 // saving the view to-be-deleted in a variable
                 var restored_view = viewHolder.itemView
-//                Log.e("adding",restored_view.txtShowTitle.text.toString())
 
                 // making an object of the to-do item (ToDoModel) about to be deleted
                 // Here I need to pass the primary key (ie id) so that item is restored in the same position in the recyclerview
@@ -419,10 +363,6 @@ class MainActivity2 : AppCompatActivity() {
                             }
                         }
 
-
-
-//                        Log.e("gg2",position.toString())
-//                        list.add(position,restored_model)
                         var snack2 = Snackbar.make(toolbar,"To Do restored",Snackbar.LENGTH_SHORT)
                         snack2.show()
                     })
@@ -457,10 +397,6 @@ class MainActivity2 : AppCompatActivity() {
                         icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_check_white_png)
                         paint.color = Color.parseColor("#388E3C")
 
-//                        canvas.drawRect(
-//                            itemView.left.toFloat(), itemView.top.toFloat(),
-//                            itemView.left.toFloat() + dX, itemView.bottom.toFloat(), paint
-//                        )
                         canvas.drawRect(
                             itemView.left.toFloat(), itemView.top.toFloat(),
                             itemView.right.toFloat(), itemView.bottom.toFloat(), paint
@@ -478,10 +414,6 @@ class MainActivity2 : AppCompatActivity() {
 
                         paint.color = Color.parseColor("#D32F2F")
 
-//                        canvas.drawRect(
-//                            itemView.right.toFloat() + dX, itemView.top.toFloat(),
-//                            itemView.right.toFloat(), itemView.bottom.toFloat(), paint
-//                        )
                         canvas.drawRect(
                             itemView.left.toFloat(), itemView.top.toFloat(),
                             itemView.right.toFloat(), itemView.bottom.toFloat(), paint
@@ -517,7 +449,6 @@ class MainActivity2 : AppCompatActivity() {
                 }
             }
 
-
         }
 
         val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
@@ -551,7 +482,6 @@ class MainActivity2 : AppCompatActivity() {
         //Mon, 5 Jan 2020
         myCalendar = Calendar.getInstance()
         var n = currDate.length
-//        Log.e("len",n.toString())
         if(n==16) {
             myCalendar.set(Calendar.YEAR, currDate.substring(12, 16).toInt())
             for(i in 0..11){
@@ -590,7 +520,6 @@ class MainActivity2 : AppCompatActivity() {
         var finalTime:Long
         myCalendar = Calendar.getInstance()
         var n = currTime.length
-//        Log.e("len",n.toString())
         if(n==8){
             var am_pm = currTime.substring(6,8);
             if(am_pm=="am")
@@ -612,8 +541,6 @@ class MainActivity2 : AppCompatActivity() {
         val myformat = "h:mm a"
         val sdf = SimpleDateFormat(myformat)
         finalTime = myCalendar.time.time
-        Log.e("time 1",finalTime.toString())
-        Log.e("time 2",System.currentTimeMillis().toString())
         return finalTime
 
     }
