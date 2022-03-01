@@ -11,8 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_history.*
 import kotlinx.android.synthetic.main.activity_history.todoRv
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.item_todo.view.*
+import kotlinx.android.synthetic.main.todo_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

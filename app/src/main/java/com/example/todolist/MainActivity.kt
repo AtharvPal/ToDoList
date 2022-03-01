@@ -1,148 +1,209 @@
 package com.example.todolist2
 
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SnapHelper
+import com.example.todolist2.databinding.ActivityMainBinding
+import com.example.todolist2.databinding.DeleteCategoryLayoutBinding
+import com.example.todolist2.databinding.TodoItemBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_task.*
-import kotlinx.android.synthetic.main.item_todo.*
-import kotlinx.android.synthetic.main.item_todo.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
+import kotlinx.android.synthetic.main.todo_item.view.*
+import kotlinx.coroutines.*
 import java.util.*
+import kotlin.collections.ArrayList
+
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var bindingItemTodo: TodoItemBinding
+    private lateinit var bindingDeleteCategory: DeleteCategoryLayoutBinding
     var list = arrayListOf<TodoModel>()
     var adapter = TodoAdapter(list)
 
-    private val labels =
-        arrayListOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
+    private val defaultCategories = listOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
+    private val months = listOf("Jan", "Feb", "Mar", "Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+    private var categories = arrayListOf<String>()
 
     val db by lazy {
         AppDatabase.getDatabase(this)
     }
 
-    override fun onPause() {
-        overridePendingTransition(R.anim.fadein,R.anim.fadeout)
-        super.onPause()
+    val db2 by lazy {
+        CategoryDatabase.getDatabase(this)
     }
+
+    override fun onStart() {
+        super.onStart()
+        setTheSpinner()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         overridePendingTransition(R.anim.fadein,R.anim.fadeout)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        bindingItemTodo = TodoItemBinding.inflate(layoutInflater)
+        bindingDeleteCategory = DeleteCategoryLayoutBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setSupportActionBar(toolbar)
-        todoRv.apply {
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        binding.todoRv.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = this@MainActivity.adapter
         }
-
+        binding.todoRv.scheduleLayoutAnimation()
         initSwipe()
-
-
-
         db.todoDao().getTask().observe(this, Observer {
             list.clear()
             if (!it.isNullOrEmpty())
                 list.addAll(it)
             adapter.notifyDataSetChanged()
-            if (list.isEmpty())
-                emptyList.visibility = View.VISIBLE
-            else
-                emptyList.visibility = View.GONE
-        })
-
-
-    }
-
-
-
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        val item = menu.findItem(R.id.search)
-        val searchView = item.actionView as SearchView
-        val item2 = menu.findItem(R.id.categories)
-        val spinner = item2.actionView as Spinner
-        val adapter = ArrayAdapter<String>(this, R.layout.spinner_item_layout_main, labels)
-        spinner.adapter = adapter
-        searchView.maxWidth = 10000
-        searchView.queryHint = "Enter a title to search..."
-
-
-//        item.setOnActionExpandListener(object :MenuItem.OnActionExpandListener{
-//            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-//                displayTodo()
-//                Toast.makeText(this@MainActivity,"first",Toast.LENGTH_SHORT).show()
-//                return true
-//            }
-//
-//            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-//                displayTodo()
-//                Toast.makeText(this@MainActivity,"second",Toast.LENGTH_SHORT).show()
-//                return true
-//            }
-//
-//
-//        })
-
-        searchView.setOnQueryTextFocusChangeListener(object:View.OnFocusChangeListener{
-            override fun onFocusChange(v: View?, hasFocus: Boolean) {
-                if(hasFocus==true){
-                    Log.e("search","done 1")
-                    spinner.visibility = View.GONE
-
-                }
-                else {
-                    Log.e("search", "done 2")
-                    spinner.visibility = View.VISIBLE
-                }
+            if (list.isEmpty()) {
+                not_found_textview.visibility = View.VISIBLE
+                not_found_anim.visibility = View.VISIBLE
+            }
+            else {
+                not_found_textview.visibility = View.GONE
+                not_found_anim.visibility = View.GONE
             }
         })
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        setTheSearchBar()
+        setTheSpinner()
+        binding.toolbarDelete.setOnClickListener {
+            deleteCategory()
+        }
+        binding.viewHistory.setOnClickListener {
+            openHistory()
+        }
+        binding.addTask.setOnClickListener {
+            openNewTask()
+        }
+    }
+
+    private fun setTheSearchBar() {
+
+        // setOnSearchListener is when user clicks on the search icon, it should by default show all the todos
+        toolbar_search.setOnSearchClickListener {
+            displayTodoByCategory(categories[0])
+        }
+        toolbar_search.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                toolbar_spinner.visibility = View.GONE
+                toolbar_delete.visibility = View.GONE
+                toolbar_search.maxWidth = 1000
+                toolbar.setBackgroundColor(getColor(R.color.black))
+
+            }
+        }
+        toolbar_search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Toast.makeText(this@MainActivity, "thir", Toast.LENGTH_SHORT).show()
                 return false
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                displayTodo(newText)
+                displayTodoByTitle(newText)
                 return true
             }
 
 
         })
-        searchView.setOnCloseListener(object : SearchView.OnCloseListener {
-            override fun onClose(): Boolean {
-                displayTodo()
-                return false
+        toolbar_search.setOnCloseListener {
+            displayTodoByCategory(categories[toolbar_spinner.selectedItemPosition])
+            toolbar_spinner.visibility = View.VISIBLE
+            if (toolbar_spinner.selectedItemPosition >= defaultCategories.size) {
+                toolbar_delete.visibility = View.VISIBLE
             }
+            toolbar.setBackgroundColor(getColor(R.color.gray_toolbar))
+            false
+        }
+    }
 
-        })
+    private fun deleteCategory(){
+        val cat = toolbar_spinner.selectedItem as String
+        val dialog = Dialog(this)
+        dialog.setContentView(bindingDeleteCategory.root)
+        val w = resources.displayMetrics.widthPixels*0.9   // to occupy 90% of screen's width
+        dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.show()
+        bindingDeleteCategory.deleteCategory.text = "Delete the category '$cat'? Any todos in this category will also be deleted."
+        bindingDeleteCategory.cancelButtonDelete.setOnClickListener {
+            dialog.dismiss()
+        }
+        bindingDeleteCategory.yesButtonDelete.setOnClickListener {
+            val bad_todo = ArrayList<Long>()
+            runBlocking {
+                launch(Dispatchers.IO) {
+                    for (x in db.todoDao().getAllTasks()){
+                        if(x.category == cat)
+                            bad_todo.add(x.id)
+                    }
 
+                }
+            }
+            runBlocking {
+                launch(Dispatchers.IO) {
+                    for(x in bad_todo)
+                        db.todoDao().deleteTask(x)
+                }
+            }
+            runBlocking {
+                launch(Dispatchers.IO) {
+                    db2.categoryDao().deleteCategory(cat)
+                }
+            }
+            val adap = toolbar_spinner.adapter as ArrayAdapter<String>
+            adap.remove(cat)
+            adap.notifyDataSetChanged()
+            displayTodoByCategory(categories[adap.count-1])
+            dialog.dismiss()
+        }
+    }
 
+    private fun setTheSpinner() {
 
+        val databaseLabels = mutableListOf<String>()
+        databaseLabels.addAll(defaultCategories)
+        runBlocking {
+            launch(Dispatchers.IO) {
+                databaseLabels.addAll(db2.categoryDao().getCategories2())
+            }
+        }
+        categories = databaseLabels as ArrayList<String>
+        val spinnerAdapter:ArrayAdapter<String> = object: ArrayAdapter<String>(this, R.layout.spinner_item_layout_main, categories){
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                val v = super.getDropDownView(position, convertView, parent)
+                var selectedCategory = v as TextView
+                if (position == toolbar_spinner.selectedItemPosition){
+                    v.setBackgroundColor(getColor(R.color.white))
+                    selectedCategory.setTextColor(Color.BLACK)
+                }
 
+                else {
+                    v.setBackgroundColor(getColor(R.color.gray))
+                    selectedCategory.setTextColor(Color.WHITE)
+                }
+                return v
+            }
+        }
+        toolbar_spinner.adapter = spinnerAdapter
 
-        spinner.onItemSelectedListener = object :
+        toolbar_spinner.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {    // idk why tf this has to be done like this
             override fun onItemSelected(
                 parent: AdapterView<*>,
@@ -150,17 +211,22 @@ class MainActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                displayTodo2(labels[position])
+                displayTodoByCategory(categories[position])
+                if(position >= defaultCategories.size){
+                    toolbar_delete.visibility = View.VISIBLE
+                }
+                else{
+                    toolbar_delete.visibility = View.GONE
+                }
             }
-
             override fun onNothingSelected(parent: AdapterView<*>) {    // is this ever called ????
-                Toast.makeText(this@MainActivity, "nothing", Toast.LENGTH_SHORT).show()
+
             }
         }
-        return super.onCreateOptionsMenu(menu)
+
     }
 
-    fun displayTodo(newText: String = "") {
+    fun displayTodoByTitle(newText: String = "") {
         db.todoDao().getTask().observe(this, Observer {
             if (it.isNotEmpty()) {
                 list.clear()
@@ -175,14 +241,18 @@ class MainActivity : AppCompatActivity() {
                 }
                 adapter.notifyDataSetChanged()
             }
-            if (list.isEmpty())
-                emptyList.visibility = View.VISIBLE
-            else
-                emptyList.visibility = View.GONE
+            if (list.isEmpty()) {
+                not_found_textview.visibility = View.VISIBLE
+                not_found_anim.visibility = View.VISIBLE
+            }
+            else {
+                not_found_textview.visibility = View.GONE
+                not_found_anim.visibility = View.GONE
+            }
         })
     }
 
-    fun displayTodo2(newText: String) {
+    fun displayTodoByCategory(newText: String) {
         db.todoDao().getTask().observe(this, Observer {
             if (it.isNotEmpty()) {
                 list.clear()
@@ -191,27 +261,30 @@ class MainActivity : AppCompatActivity() {
                 else {
                     list.addAll(
                         it.filter { todo ->
-                            todo.category.contains(newText, true)
+                            todo.category.equals(newText, false)
                         }
                     )
                 }
                 adapter.notifyDataSetChanged()
             }
-            if (list.isEmpty())
-                emptyList.visibility = View.VISIBLE
-            else
-                emptyList.visibility = View.GONE
+            if (list.isEmpty()) {
+                not_found_textview.visibility = View.VISIBLE
+                not_found_anim.visibility = View.VISIBLE
+            }
+            else {
+                not_found_textview.visibility = View.GONE
+                not_found_anim.visibility = View.GONE
+            }
         })
     }
 
-    fun openNewTask(view: View) {
+    private fun openNewTask() {
         startActivity(Intent(this,TaskActivity::class.java))
 
     }
 
-    fun openHistory(view: View) {
+    private fun openHistory() {
         startActivity(Intent(this,HistoryActivity::class.java))
-
     }
 
 
@@ -236,6 +309,7 @@ class MainActivity : AppCompatActivity() {
             0,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -244,19 +318,14 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-//                Log.e("gg",position.toString())
 
                 // I need the id (Primary Key) of the to-do because in case user decides to undo the delete operation,
                 // the Primary Key is needed to restore the to-do in the same place as before
 
                 var id = adapter.getItemId(position)
-//                Log.e("gg",adapter.getItemId(position).toString())
-//                Log.e("gg",v.toString())
-
 
                 // saving the view to-be-deleted in a variable
                 var restored_view = viewHolder.itemView
-//                Log.e("adding",restored_view.txtShowTitle.text.toString())
 
                 // making an object of the to-do item (ToDoModel) about to be deleted
                 // Here I need to pass the primary key (ie id) so that item is restored in the same position in the recyclerview
@@ -267,9 +336,14 @@ class MainActivity : AppCompatActivity() {
                     updateTime3(restored_view.txtShowTime.text.toString()),0,id)
                 if (direction == ItemTouchHelper.LEFT) {
 
+
                     GlobalScope.launch(Dispatchers.IO) {
                         db.todoDao().deleteTask(adapter.getItemId(position))
                     }
+
+
+
+
                     var snack = Snackbar.make(toolbar,"To Do deleted",Snackbar.LENGTH_SHORT)
 
                     // if user decides to restore the to-do
@@ -283,10 +357,7 @@ class MainActivity : AppCompatActivity() {
                                 )
                             }
                         }
-//                        adapter.notifyDataSetChanged()
 
-//                        Log.e("gg2",position.toString())
-//                        list.add(position,restored_model)
                         var snack2 = Snackbar.make(toolbar,"To Do restored",Snackbar.LENGTH_SHORT)
                         snack2.show()
                     })
@@ -298,6 +369,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     Snackbar.make(toolbar,"To Do finished",Snackbar.LENGTH_SHORT).show()
                 }
+                displayTodoByCategory(restored_view.txtShowCategory.text.toString())
             }
 
             override fun onChildDraw(
@@ -322,9 +394,8 @@ class MainActivity : AppCompatActivity() {
 
                         canvas.drawRect(
                             itemView.left.toFloat(), itemView.top.toFloat(),
-                            itemView.left.toFloat() + dX, itemView.bottom.toFloat(), paint
+                            itemView.right.toFloat(), itemView.bottom.toFloat(), paint
                         )
-
                         canvas.drawBitmap(
                             icon,
                             itemView.left.toFloat(),
@@ -333,21 +404,28 @@ class MainActivity : AppCompatActivity() {
                         )
 
 
-                    } else {
+                    } else  if (dX<0){
                         icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_delete_white_png)
 
                         paint.color = Color.parseColor("#D32F2F")
 
                         canvas.drawRect(
-                            itemView.right.toFloat() + dX, itemView.top.toFloat(),
+                            itemView.left.toFloat(), itemView.top.toFloat(),
                             itemView.right.toFloat(), itemView.bottom.toFloat(), paint
                         )
-
                         canvas.drawBitmap(
                             icon,
                             itemView.right.toFloat() - icon.width,
                             itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - icon.height.toFloat()) / 2,
                             paint
+                        )
+                    }
+                    else{   // this else is when item is not swiped, which is to set color to black
+                        paint.color = getColor(R.color.black)
+
+                        canvas.drawRect(
+                            itemView.left.toFloat(), itemView.top.toFloat(),
+                            itemView.right.toFloat(), itemView.bottom.toFloat(), paint
                         )
                     }
                     viewHolder.itemView.translationX = dX
@@ -365,7 +443,6 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
             }
-
 
         }
 
@@ -394,13 +471,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateDate3(currDate:String):Long {
         // ADD THIS FUNCTION TO A CLASS
-        var myCalendar:Calendar
-        var finalDate:Long
-        val months = arrayListOf("Jan", "Feb", "Mar", "Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+        val finalDate:Long
         //Mon, 5 Jan 2020
-        myCalendar = Calendar.getInstance()
-        var n = currDate.length
-//        Log.e("len",n.toString())
+        val myCalendar = Calendar.getInstance()
+        val n = currDate.length
         if(n==16) {
             myCalendar.set(Calendar.YEAR, currDate.substring(12, 16).toInt())
             for(i in 0..11){
@@ -422,9 +496,6 @@ class MainActivity : AppCompatActivity() {
             }
             myCalendar.set(Calendar.DAY_OF_MONTH, currDate.substring(5, 6).toInt())
         }
-
-        val myformat = "EEE, d MMM yyyy"
-        val sdf = SimpleDateFormat(myformat)
         finalDate = myCalendar.time.time
         return finalDate
     }
@@ -435,35 +506,30 @@ class MainActivity : AppCompatActivity() {
 
         //Mon, 5 Jan 2020
 
-        var myCalendar:Calendar
-        var finalTime:Long
-        myCalendar = Calendar.getInstance()
-        var n = currTime.length
-//        Log.e("len",n.toString())
+        val finalTime:Long
+        val myCalendar = Calendar.getInstance()
+        val n = currTime.length
         if(n==8){
-            var am_pm = currTime.substring(6,8);
-            if(am_pm=="am")
+            val format24Hr = currTime.substring(6,8)
+            if(format24Hr == "am")
                 myCalendar.set(Calendar.AM_PM, Calendar.AM)
             else
                 myCalendar.set(Calendar.AM_PM, Calendar.PM)
             myCalendar.set(Calendar.MINUTE,currTime.substring(3,5).toInt())
             myCalendar.set(Calendar.HOUR,currTime.substring(0,2).toInt())
         }
-        else{
-            var am_pm = currTime.substring(5,7);
-            if(am_pm=="am")
+        else {
+            val format24Hr = currTime.substring(5,7)
+            if(format24Hr == "am")
                 myCalendar.set(Calendar.AM_PM, Calendar.AM)
             else
                 myCalendar.set(Calendar.AM_PM, Calendar.PM)
             myCalendar.set(Calendar.MINUTE,currTime.substring(2,4).toInt())
             myCalendar.set(Calendar.HOUR,currTime.substring(0,1).toInt())
         }
-        val myformat = "h:mm a"
-        val sdf = SimpleDateFormat(myformat)
         finalTime = myCalendar.time.time
         return finalTime
 
     }
-
 
 }

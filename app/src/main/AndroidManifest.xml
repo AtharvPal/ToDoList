@@ -10,7 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/MyTheme">
         <activity android:name=".HistoryActivity" />
-        <activity android:name=".MainActivity2" />
         <activity android:name=".MainActivity" />
         <activity android:name=".TaskActivity" />
         <activity android:name=".SplashScreen">

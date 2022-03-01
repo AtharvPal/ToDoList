@@ -6,15 +6,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
 import kotlinx.android.synthetic.main.activity_task.*
-import kotlinx.android.synthetic.main.item_todo.view.*
+import kotlinx.android.synthetic.main.todo_item.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,7 +19,7 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
         return TodoViewHolder(
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_todo, parent, false))
+                .inflate(R.layout.todo_item, parent, false))
 
     }
     override fun getItemCount() = list.size

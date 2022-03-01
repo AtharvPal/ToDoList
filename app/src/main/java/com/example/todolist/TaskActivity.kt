@@ -20,11 +20,10 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main2.*
 import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.android.synthetic.main.add_category_dialog.*
 import kotlinx.android.synthetic.main.dialog_layout.*
-import kotlinx.android.synthetic.main.item_todo.*
+import kotlinx.android.synthetic.main.todo_item.*
 import kotlinx.coroutines.*
 import java.text.FieldPosition
 import java.text.SimpleDateFormat
