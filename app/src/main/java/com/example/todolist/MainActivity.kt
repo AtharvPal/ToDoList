@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         val w = resources.displayMetrics.widthPixels*0.9   // to occupy 90% of screen's width
         dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog.show()
-        bindingDeleteCategory.deleteCategory.text = "Delete the category '$cat'? Any todos in this category will also be deleted."
+        bindingDeleteCategory.deleteCategory.text = String.format(getString(R.string.delete_category_text),cat)
         bindingDeleteCategory.cancelButtonDelete.setOnClickListener {
             dialog.dismiss()
         }
@@ -346,20 +346,20 @@ class MainActivity : AppCompatActivity() {
                     val snack = Snackbar.make(toolbar,"To Do deleted",Snackbar.LENGTH_SHORT)
 
                     // if user decides to restore the to-do
-                    snack.setAction("UNDO",View.OnClickListener {
+                    snack.setAction("UNDO") {
 
                         // insert the deleted to-do as a new to-do, passing the primary key of the former to latter
-                        GlobalScope.launch(Dispatchers.Main){
-                            val id = withContext(Dispatchers.IO) {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            val id2 = withContext(Dispatchers.IO) {
                                 return@withContext db.todoDao().insertTask(
                                     restoredModel
                                 )
                             }
                         }
 
-                        val snack2 = Snackbar.make(toolbar,"To Do restored",Snackbar.LENGTH_SHORT)
+                        val snack2 = Snackbar.make(toolbar, "To Do restored", Snackbar.LENGTH_SHORT)
                         snack2.show()
-                    })
+                    }
                     snack.setActionTextColor(getColor(R.color.green))
                     snack.show()
                 } else if (direction == ItemTouchHelper.RIGHT) {

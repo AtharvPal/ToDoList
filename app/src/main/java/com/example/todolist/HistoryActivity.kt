@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_history.*
 import kotlinx.android.synthetic.main.activity_history.todoRv
-import kotlinx.android.synthetic.main.todo_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class HistoryActivity : AppCompatActivity() {
 
@@ -63,9 +61,7 @@ class HistoryActivity : AppCompatActivity() {
 
 
 
-
-
-    fun initSwipe() {
+    private fun initSwipe() {
         val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
             0,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
@@ -88,7 +84,7 @@ class HistoryActivity : AppCompatActivity() {
                     GlobalScope.launch(Dispatchers.IO) {
                         db.todoDao().deleteTask(adapter.getItemId(position))
                     }
-                    var snack = Snackbar.make(historyToolbar,"To Do deleted", Snackbar.LENGTH_SHORT)
+                    val snack = Snackbar.make(historyToolbar,"To Do deleted", Snackbar.LENGTH_SHORT)
                     adapter.notifyDataSetChanged()
                     snack.show()
                 }
@@ -97,7 +93,7 @@ class HistoryActivity : AppCompatActivity() {
                         GlobalScope.launch(Dispatchers.IO) {
                             db.todoDao().unfinishTask(adapter.getItemId(position))
                         }
-                        var snack = Snackbar.make(historyToolbar,"To Do set as unfinished", Snackbar.LENGTH_SHORT)
+                        val snack = Snackbar.make(historyToolbar,"To Do set as unfinished", Snackbar.LENGTH_SHORT)
                         adapter.notifyDataSetChanged()
                         snack.show()
                 }
