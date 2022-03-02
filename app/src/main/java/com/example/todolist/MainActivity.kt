@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         AppDatabase.getDatabase(this)
     }
 
-    val db2 by lazy {
+    private val db2 by lazy {
         CategoryDatabase.getDatabase(this)
     }
 
@@ -142,19 +142,19 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         bindingDeleteCategory.yesButtonDelete.setOnClickListener {
-            val bad_todo = ArrayList<Long>()
+            val todosToBeDeleted = ArrayList<Long>()
             runBlocking {
                 launch(Dispatchers.IO) {
                     for (x in db.todoDao().getAllTasks()){
                         if(x.category == cat)
-                            bad_todo.add(x.id)
+                            todosToBeDeleted.add(x.id)
                     }
 
                 }
             }
             runBlocking {
                 launch(Dispatchers.IO) {
-                    for(x in bad_todo)
+                    for(x in todosToBeDeleted)
                         db.todoDao().deleteTask(x)
                 }
             }
@@ -163,10 +163,10 @@ class MainActivity : AppCompatActivity() {
                     db2.categoryDao().deleteCategory(cat)
                 }
             }
-            val adap = toolbar_spinner.adapter as ArrayAdapter<String>
-            adap.remove(cat)
-            adap.notifyDataSetChanged()
-            displayTodoByCategory(categories[adap.count-1])
+            val spinnerAdapter = toolbar_spinner.adapter as ArrayAdapter<String>
+            spinnerAdapter.remove(cat)
+            spinnerAdapter.notifyDataSetChanged()
+            displayTodoByCategory(categories[spinnerAdapter.count-1])
             dialog.dismiss()
         }
     }
@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity() {
                 parent: ViewGroup
             ): View {
                 val v = super.getDropDownView(position, convertView, parent)
-                var selectedCategory = v as TextView
+                val selectedCategory = v as TextView
                 if (position == toolbar_spinner.selectedItemPosition){
                     v.setBackgroundColor(getColor(R.color.white))
                     selectedCategory.setTextColor(Color.BLACK)
@@ -304,7 +304,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    fun initSwipe() {
+    private fun initSwipe() {
         val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
             0,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
@@ -322,20 +322,19 @@ class MainActivity : AppCompatActivity() {
                 // I need the id (Primary Key) of the to-do because in case user decides to undo the delete operation,
                 // the Primary Key is needed to restore the to-do in the same place as before
 
-                var id = adapter.getItemId(position)
+                val id = adapter.getItemId(position)
 
                 // saving the view to-be-deleted in a variable
-                var restored_view = viewHolder.itemView
+                val restoredView = viewHolder.itemView
 
                 // making an object of the to-do item (ToDoModel) about to be deleted
                 // Here I need to pass the primary key (ie id) so that item is restored in the same position in the recyclerview
-                var restored_model = TodoModel(restored_view.txtShowTitle.text.toString(),
-                    restored_view.txtShowTask.text.toString(),
-                    restored_view.txtShowCategory.text.toString(),
-                    updateDate3(restored_view.txtShowDate.text.toString()),
-                    updateTime3(restored_view.txtShowTime.text.toString()),0,id)
+                val restoredModel = TodoModel(restoredView.txtShowTitle.text.toString(),
+                    restoredView.txtShowTask.text.toString(),
+                    restoredView.txtShowCategory.text.toString(),
+                    updateDate3(restoredView.txtShowDate.text.toString()),
+                    updateTime3(restoredView.txtShowTime.text.toString()),0,id)
                 if (direction == ItemTouchHelper.LEFT) {
-
 
                     GlobalScope.launch(Dispatchers.IO) {
                         db.todoDao().deleteTask(adapter.getItemId(position))
@@ -344,7 +343,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-                    var snack = Snackbar.make(toolbar,"To Do deleted",Snackbar.LENGTH_SHORT)
+                    val snack = Snackbar.make(toolbar,"To Do deleted",Snackbar.LENGTH_SHORT)
 
                     // if user decides to restore the to-do
                     snack.setAction("UNDO",View.OnClickListener {
@@ -353,12 +352,12 @@ class MainActivity : AppCompatActivity() {
                         GlobalScope.launch(Dispatchers.Main){
                             val id = withContext(Dispatchers.IO) {
                                 return@withContext db.todoDao().insertTask(
-                                    restored_model
+                                    restoredModel
                                 )
                             }
                         }
 
-                        var snack2 = Snackbar.make(toolbar,"To Do restored",Snackbar.LENGTH_SHORT)
+                        val snack2 = Snackbar.make(toolbar,"To Do restored",Snackbar.LENGTH_SHORT)
                         snack2.show()
                     })
                     snack.setActionTextColor(getColor(R.color.green))
@@ -369,7 +368,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     Snackbar.make(toolbar,"To Do finished",Snackbar.LENGTH_SHORT).show()
                 }
-                displayTodoByCategory(restored_view.txtShowCategory.text.toString())
+                displayTodoByCategory(restoredView.txtShowCategory.text.toString())
             }
 
             override fun onChildDraw(

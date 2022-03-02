@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:textCursorDrawable="@drawable/cursor"
-        android:hint="New category name"
+        android:hint="@string/new_category_name"
         android:maxLength="14"
         android:id="@+id/new_category_name"
         android:textColorHint="@color/gray"/>
