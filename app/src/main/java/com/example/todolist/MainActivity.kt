@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -133,8 +134,12 @@ class MainActivity : AppCompatActivity() {
     private fun deleteCategory(){
         val cat = toolbar_spinner.selectedItem as String
         val dialog = Dialog(this)
+        if (bindingDeleteCategory.root.parent!=null) {
+            val parent = bindingDeleteCategory.root.parent as ViewGroup
+            parent.removeView(bindingDeleteCategory.root)
+        }
         dialog.setContentView(bindingDeleteCategory.root)
-        val w = resources.displayMetrics.widthPixels*0.9   // to occupy 90% of screen's width
+        val w = resources.displayMetrics.widthPixels*0.95   // to occupy 95% of screen's width
         dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog.show()
         bindingDeleteCategory.deleteCategory.text = String.format(getString(R.string.delete_category_text),cat)

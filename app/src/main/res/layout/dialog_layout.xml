@@ -1,125 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#1F1F1F"
+    android:orientation="vertical"
+    android:paddingHorizontal="10dp"
     android:layout_height="wrap_content">
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/discard"
+        android:paddingBottom="7dp"
+        android:paddingTop="15dp"
+        android:paddingHorizontal="10dp"
+        android:text="@string/discard"
+        android:textAlignment="textStart"
+        android:textSize="16sp"
+        android:textColor="@color/white"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:background="#0C0C0C"
-        android:orientation="vertical"
-        android:paddingHorizontal="10dp"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:id="@+id/discard"
-            android:paddingBottom="15dp"
-            android:paddingTop="20dp"
-            android:paddingHorizontal="30dp"
-            android:text="Discard?"
-            android:textAlignment="center"
-            android:textSize="16sp"
-            android:textColor="@color/white"/>
-<!--        needed to use material button because I could'nt figure out-->
-<!--        a way to remove padding/space around the text inside button-->
-        <com.google.android.material.button.MaterialButton
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2.5"/>
+
+        <Button
             android:id="@+id/yes_button"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:layout_marginHorizontal="10dp"
-            android:background="@drawable/button_background"
-            android:text="Yes"
-            android:insetBottom="0dp"
-            android:insetTop="0dp"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="15sp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:background="@android:color/transparent"
+            android:text="@string/yes"
+            android:textColor="@color/green"
+            android:textSize="14sp"
             tools:ignore="TouchTargetSizeCheck" />
 
         <Button
             android:id="@+id/cancel_button"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:backgroundTint="#0C0C0C"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
+            android:layout_weight="2"
             android:background="@android:color/transparent"
-            android:text="Cancel"
-            android:textAllCaps="false"
+            android:text="@string/cancel"
             android:textColor="@color/green"
             android:textSize="14sp" />
+
     </LinearLayout>
+</LinearLayout>
 
-</RelativeLayout>
-
-
-
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--    android:layout_width="match_parent"-->
-    <!--    android:background="@color/black"-->
-    <!--    android:layout_height="wrap_content">-->
-    <!--    <TextView-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:id="@+id/discard"-->
-    <!--        android:paddingTop="10dp"-->
-    <!--        android:paddingLeft="10dp"-->
-    <!--        android:paddingBottom="5dp"-->
-    <!--        android:text="Discard ?"-->
-    <!--        android:textColor="@color/white"/>-->
-    <!--    <LinearLayout-->
-    <!--        android:layout_below="@+id/discard"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_width="match_parent">-->
-
-
-    <!--        &lt;!&ndash;    below view is just to push the YES and CANCEL button to right, it&ndash;&gt;-->
-    <!--        &lt;!&ndash;        has no purpose whatsoever&ndash;&gt;-->
-
-    <!--        <View-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            android:layout_weight="2"/>-->
-
-    <!--        &lt;!&ndash;        both buttons have background as transparent as I did'nt like &ndash;&gt;-->
-    <!--        &lt;!&ndash;        the default ripple effect, remove the background attribute to &ndash;&gt;-->
-    <!--        &lt;!&ndash;        see it&ndash;&gt;-->
-
-
-    <!--        &lt;!&ndash;        On the "how to customize ripple effect" part, using Material Components-->
-    <!--                    library v1.1.0, the background is by default a RippleDrawable with its color-->
-    <!--                    set to a ColorStateList of 2 colors: A 26 alpha (#A1 in hex) colorControlActivated-->
-    <!--                    in enabled and checked state, and for the default state an alpha white or black-->
-    <!--                    depending on whether you have a light (#1F000000) or dark theme (#33FFFFFF).-->
-    <!--                    I retrieved this info simply by inspecting the background of a MaterialCheckBox-->
-    <!--                    in the debugger.&ndash;&gt;-->
-
-    <!--        &lt;!&ndash;        You can just override the color of the RippleDrawable however you wish using its-->
-    <!--                    setColor method.&ndash;&gt;-->
-
-    <!--        <Button-->
-
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_weight="2"-->
-    <!--            android:id="@+id/yes_button"-->
-    <!--            android:background="@android:color/transparent"-->
-    <!--            android:textColor="@color/green"-->
-    <!--            android:textSize="14sp"-->
-    <!--            android:text="Yes"/>-->
-    <!--        <Button-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_weight="2"-->
-    <!--            android:id="@+id/cancel_button"-->
-    <!--            android:backgroundTint="@color/black"-->
-    <!--            android:textColor="@color/green"-->
-    <!--            android:background="@android:color/transparent"-->
-    <!--            android:textSize="14sp"-->
-    <!--            android:text="Cancel"/>-->
-    <!--    </LinearLayout>-->
-    <!--</RelativeLayout>-->

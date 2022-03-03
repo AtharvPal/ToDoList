@@ -184,7 +184,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     override fun onBackPressed() {
         val dialog = Dialog(titleInpLay.context)
         dialog.setContentView(R.layout.dialog_layout)
-        val w = resources.displayMetrics.widthPixels*0.9   // to occupy 90% of screen's width
+        val w = resources.displayMetrics.widthPixels*0.95   // to occupy 95% of screen's width
         dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog.show()
         var dialogText = "Discard To Do?"

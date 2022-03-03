@@ -7,4 +7,7 @@
     <string name="delete_a_category">Delete a category.</string>
     <string name="new_category_name">New category name</string>
     <string name="delete_category_text">Delete the category \'%1$s\'? Any todos in this category will also be deleted.</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="discard">Discard?</string>
 </resources>
