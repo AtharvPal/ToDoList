@@ -4,61 +4,62 @@ import android.graphics.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todolist2.databinding.ActivityHistoryBinding
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_history.*
-import kotlinx.android.synthetic.main.activity_history.todoRv
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class HistoryActivity : AppCompatActivity() {
 
+    private lateinit var binding:ActivityHistoryBinding
     var list = arrayListOf<TodoModel>()
     var adapter = TodoAdapter(list)
 
-    val db by lazy {
+    private val todoDatabase by lazy {
         AppDatabase.getDatabase(this)
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_history)
+        binding = ActivityHistoryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        todoRv.apply {
-            layoutManager = LinearLayoutManager(this@HistoryActivity)
-            adapter = this@HistoryActivity.adapter
+        lifecycleScope.launch(Dispatchers.IO) {
+            list = todoDatabase.todoDao().getAllFinishedTasks() as ArrayList<TodoModel>
+            adapter = TodoAdapter(list)
+            binding.todoRv.apply {
+                layoutManager = LinearLayoutManager(this@HistoryActivity)
+                adapter = this@HistoryActivity.adapter
+            }
         }
 
-        db.todoDao().getFinishedTasks().observe(this, Observer {
+
+
+
+        todoDatabase.todoDao().getFinishedTasks().observe(this) {
             list.clear()
             if (!it.isNullOrEmpty())
                 list.addAll(it)
-            adapter.notifyDataSetChanged()
             if (list.isEmpty()) {
-                emptyListHistory.visibility = View.VISIBLE
-                not_found_anim_history.visibility = View.VISIBLE
+                binding.emptyListHistory.visibility = View.VISIBLE
+                binding.notFoundAnimHistory.visibility = View.VISIBLE
+            } else {
+                binding.emptyListHistory.visibility = View.GONE
+                binding.notFoundAnimHistory.visibility = View.GONE
             }
-            else {
-                emptyListHistory.visibility = View.GONE
-                not_found_anim_history.visibility = View.GONE
-            }
-        })
-
+        }
         initSwipe()
+
+        binding.backHistory.setOnClickListener {
+            finish()
+        }
     }
-
-
-    fun finishHistory(view:View){
-        finish()
-    }
-
-
 
 
     private fun initSwipe() {
@@ -74,28 +75,31 @@ class HistoryActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-//                Log.e("gg",position.toString())
-
-
-
 
                 if (direction == ItemTouchHelper.LEFT) {
 
-                    GlobalScope.launch(Dispatchers.IO) {
-                        db.todoDao().deleteTask(adapter.getItemId(position))
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        todoDatabase.todoDao().deleteTask(adapter.getItemId(position))
+                        list.removeAt(position)
+                        withContext(Dispatchers.Main) {
+                            adapter.notifyItemRemoved(position)
+                        }
                     }
                     val snack = Snackbar.make(historyToolbar,"To Do deleted", Snackbar.LENGTH_SHORT)
-                    adapter.notifyDataSetChanged()
                     snack.show()
                 }
                 else if (direction == ItemTouchHelper.RIGHT) {
 
-                        GlobalScope.launch(Dispatchers.IO) {
-                            db.todoDao().unfinishTask(adapter.getItemId(position))
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        todoDatabase.todoDao().unfinishTask(adapter.getItemId(position))
+                        withContext (Dispatchers.Main) {
+                            list.removeAt(position)
+                            adapter.notifyItemRemoved(position)
                         }
-                        val snack = Snackbar.make(historyToolbar,"To Do set as unfinished", Snackbar.LENGTH_SHORT)
-                        adapter.notifyDataSetChanged()
-                        snack.show()
+                    }
+                    val snack = Snackbar.make(historyToolbar,"To Do set as unfinished", Snackbar.LENGTH_SHORT)
+                    snack.show()
+
                 }
             }
 
@@ -109,20 +113,17 @@ class HistoryActivity : AppCompatActivity() {
                 isCurrentlyActive: Boolean
             ) {
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                    val itemView = viewHolder.itemView
+                    val itemView = viewHolder.itemView as MaterialCardView
 
                     val paint = Paint()
-                    val icon: Bitmap
+                    var icon: Bitmap
 
                     if (dX > 0) {
-
+                        itemView.radius = 20F
                         icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_check_white_png)
+                        icon = Bitmap.createScaledBitmap(icon, (4*icon.width)/3, (4*icon.height)/3,false)
                         paint.color = Color.parseColor("#388E3C")
 
-//                        canvas.drawRect(
-//                            itemView.left.toFloat(), itemView.top.toFloat(),
-//                            itemView.left.toFloat() + dX, itemView.bottom.toFloat(), paint
-//                        )
                         canvas.drawRect(
                             itemView.left.toFloat(), itemView.top.toFloat(),
                             itemView.right.toFloat(), itemView.bottom.toFloat(), paint
@@ -130,21 +131,18 @@ class HistoryActivity : AppCompatActivity() {
 
                         canvas.drawBitmap(
                             icon,
-                            itemView.left.toFloat(),
+                            itemView.left.toFloat() + icon.width / 3,
                             itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - icon.height.toFloat()) / 2,
                             paint
                         )
 
 
-                    } else if(dX<0){
+                    } else if(dX < 0){
+                        itemView.radius = 20F
                         icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_delete_white_png)
-
+                        icon = Bitmap.createScaledBitmap(icon, (4*icon.width)/3, (4*icon.height)/3,false)
                         paint.color = Color.parseColor("#D32F2F")
 
-//                        canvas.drawRect(
-//                            itemView.right.toFloat() + dX, itemView.top.toFloat(),
-//                            itemView.right.toFloat(), itemView.bottom.toFloat(), paint
-//                        )
                         canvas.drawRect(
                             itemView.left.toFloat(), itemView.top.toFloat(),
                             itemView.right.toFloat(), itemView.bottom.toFloat(), paint
@@ -152,12 +150,13 @@ class HistoryActivity : AppCompatActivity() {
 
                         canvas.drawBitmap(
                             icon,
-                            itemView.right.toFloat() - icon.width,
+                            itemView.right.toFloat() - icon.width - icon.width / 3,
                             itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - icon.height.toFloat()) / 2,
                             paint
                         )
                     }
                     else{
+                        itemView.radius = 0F
                         paint.color = getColor(R.color.black)
 
                         canvas.drawRect(
@@ -181,10 +180,7 @@ class HistoryActivity : AppCompatActivity() {
                     )
                 }
             }
-
-
         }
-
         val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
         itemTouchHelper.attachToRecyclerView(todoRv)
     }

@@ -28,4 +28,7 @@ interface TodoDao {
 
     @Query("Select * from TodoModel")
     fun getAllTasks():List<TodoModel>
+
+    @Query("Select * from TodoModel where isFinished == 1")
+    fun getAllFinishedTasks():List<TodoModel>
 }

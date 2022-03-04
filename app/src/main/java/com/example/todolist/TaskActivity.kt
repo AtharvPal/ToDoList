@@ -80,7 +80,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
         if(title2!=null) {
             titleInpLay.setText(title2.toString())
-            addtask.text = "Edit Task"
+            addTask.text = "Edit Task"
             // below is to set cursor position of title at end of the textview
             titleInpLay.setSelection(titleInpLay.text.toString().length)
         }

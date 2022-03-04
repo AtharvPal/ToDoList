@@ -10,4 +10,12 @@
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="discard">Discard?</string>
+    <string name="back">Back</string>
+    <string name="finished_tasks">Finished Tasks</string>
+    <string name="new_task">New Task</string>
+    <string name="title">Title</string>
+    <string name="what_is_to_be_done">What is to be done?</string>
+    <string name="set_reminder_date_and_time">Set reminder date and time</string>
+    <string name="select_category">Select category</string>
+    <string name="save_task">Save Task</string>
 </resources>
