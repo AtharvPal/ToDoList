@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import com.example.todolist2.databinding.ActivityTaskBinding
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_task.*
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,11 +41,11 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var date3:String
     private lateinit var time3:String
 
-    private val db by lazy {
+    private val todoDatabase by lazy {
         AppDatabase.getDatabase(this)
     }
 
-    private val db2 by lazy {
+    private val categoryDatabase by lazy {
         CategoryDatabase.getDatabase(this)
     }
 
@@ -63,10 +62,10 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
         setUpSpinner()
 
-        titleInpLay.requestFocus()   // to set the initial focus to title edit text view
-        dateEdt.setOnClickListener(this)
-        timeEdt.setOnClickListener(this)
-        saveBtn.setOnClickListener(this)
+        binding.inputTitle.requestFocus()   // to set the initial focus to title edit text view
+        binding.inputDate.setOnClickListener(this)
+        binding.inputTime.setOnClickListener(this)
+        binding.saveTodo.setOnClickListener(this)
 
         val title2 = intent.getStringExtra("title")
         val desc2 = intent.getStringExtra("desc")
@@ -79,10 +78,10 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
 
         if(title2!=null) {
-            titleInpLay.setText(title2.toString())
-            addTask.text = "Edit Task"
+            binding.inputTitle.setText(title2.toString())
+            binding.toolbarTaskTitle.text = "Edit Task"
             // below is to set cursor position of title at end of the textview
-            titleInpLay.setSelection(titleInpLay.text.toString().length)
+            binding.inputTitle.setSelection(binding.inputTitle.text.toString().length)
         }
         val defaultDate:String
         val defaultTime:String
@@ -95,8 +94,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         defaultDate=sdf1.format(System.currentTimeMillis())
 
         if(desc2!=null)
-            taskInpLay.setText(desc2.toString())
-        taskInpLay.setText(desc2)
+            binding.inputDescription.setText(desc2.toString())
+        binding.inputDescription.setText(desc2)
         if(date2!=null)
             updateDate2(date2.toString())
         else
@@ -111,11 +110,11 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
         // how the heck people do android dev? it is literally trash
 
-        val spinnerAdapter = spinnerCategory.adapter as ArrayAdapter<String>
+        val spinnerAdapter = binding.spinnerCategory.adapter as ArrayAdapter<String>
         val pos = spinnerAdapter.getPosition(category2)
-        spinnerCategory.setSelection(Math.max(0,pos))
+        binding.spinnerCategory.setSelection(Math.max(0,pos))
 
-        binding.addNewCategory.setOnClickListener {
+        binding.addNewCategoryBtn.setOnClickListener {
             addNewCategory()
         }
 
@@ -123,7 +122,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
 
     private fun addNewCategory(){
-        val dialog = Dialog(titleInpLay.context)
+        val dialog = Dialog(binding.inputTitle.context)
         dialog.setContentView(R.layout.add_category_dialog)
         dialog.show()
         val newCategoryOk = dialog.findViewById<Button>(R.id.new_category_ok)
@@ -150,29 +149,30 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             var already = false
             runBlocking {
                 launch(Dispatchers.IO) {
-                    if(newCategory in db2.categoryDao().getCategories2())
+                    if(newCategory in categoryDatabase.categoryDao().getCategories2())
                         already = true
                 }
             }
             if (already){
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-                val snack = Snackbar.make(titleInpLay,"Category already exists!",Snackbar.LENGTH_SHORT)
+                val snack = Snackbar.make(binding.inputTitle,"Category already exists!",Snackbar.LENGTH_SHORT)
                 snack.show()
                 dialog.dismiss()
             }
             else{
                 GlobalScope.launch(Dispatchers.Main){
                     val id = withContext(Dispatchers.IO) {
-                        return@withContext db2.categoryDao().insertCategory(
+                        return@withContext categoryDatabase.categoryDao().insertCategory(
                             CategoryModel(
                                 newCategory
                             )
                         )
                     }
                 }
-                val spinnerAdapter = spinnerCategory.adapter as ArrayAdapter<String>
+                val spinnerAdapter = binding.spinnerCategory.adapter as ArrayAdapter<String>
                 spinnerAdapter.add(newCategory)
+
                 spinnerAdapter.notifyDataSetChanged()
                 dialog.dismiss()
             }
@@ -182,7 +182,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
 
     override fun onBackPressed() {
-        val dialog = Dialog(titleInpLay.context)
+        val dialog = Dialog(binding.inputTitle.context)
         dialog.setContentView(R.layout.dialog_layout)
         val w = resources.displayMetrics.widthPixels*0.95   // to occupy 95% of screen's width
         dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -213,7 +213,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
         runBlocking {
             GlobalScope.launch {
-                databaseLabels.addAll(db2.categoryDao().getCategories2())
+                databaseLabels.addAll(categoryDatabase.categoryDao().getCategories2())
             }
         }
 
@@ -225,7 +225,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             ): View {
                 val v = super.getDropDownView(position, convertView, parent)
                 val selected = v as TextView
-                if (position == spinnerCategory.selectedItemPosition) {
+                if (position == binding.spinnerCategory.selectedItemPosition) {
                     v.setBackgroundColor(getColor(R.color.white))
                     selected.setTextColor(getColor(R.color.gray_toolbar))
                 }
@@ -237,8 +237,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
                 return v
             }
         }
-        spinnerCategory.adapter = spinnerAdapter
-        spinnerCategory.setPopupBackgroundResource(R.color.black)
+        binding.spinnerCategory.adapter = spinnerAdapter
+        binding.spinnerCategory.setPopupBackgroundResource(R.color.black)
     }
 
     override fun onClick(v: View) {
@@ -247,13 +247,13 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         when (v.id) {
-            R.id.dateEdt -> {
+            R.id.input_date -> {
                 setDateListener()
             }
-            R.id.timeEdt -> {
+            R.id.input_time -> {
                 setTimeListener()
             }
-            R.id.saveBtn -> {
+            R.id.save_todo -> {
                 val position2 = intent.getIntExtra("position",-1)
                 saveTodo(position2)
             }
@@ -261,22 +261,22 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun saveTodo(position: Int) {
-        val category = spinnerCategory.selectedItem.toString()
-        val title = titleInpLay.text.toString()
-        val description = taskInpLay.text.toString()
+        val category = binding.spinnerCategory.selectedItem.toString()
+        val title = binding.inputTitle.text.toString()
+        val description = binding.inputDescription.text.toString()
         if (TextUtils.isEmpty(title))
-            Toast.makeText(titleInpLay.context,"Please enter a title",Toast.LENGTH_SHORT).show()
+            Toast.makeText(binding.inputTitle.context,"Please enter a title",Toast.LENGTH_SHORT).show()
         else if(finalDate == 0L)
-            Toast.makeText(titleInpLay.context,"Please select a date",Toast.LENGTH_SHORT).show()
+            Toast.makeText(binding.inputTitle.context,"Please select a date",Toast.LENGTH_SHORT).show()
         else if(finalTime == 0L)
-            Toast.makeText(titleInpLay.context,"Please select a time",Toast.LENGTH_SHORT).show()
+            Toast.makeText(binding.inputTitle.context,"Please select a time",Toast.LENGTH_SHORT).show()
 
         else {
             var isUpdated = false
             if (position!=-1){
                 isUpdated = true
                 GlobalScope.launch(Dispatchers.IO) {
-                    db.todoDao().deleteTask(position.toLong())
+                    todoDatabase.todoDao().deleteTask(position.toLong())
                 }
             }
 //            val myFormat = "EEE, d MMM yyyy h:mm a"
@@ -298,7 +298,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 //                Log.e("compare 4"," ${combinedDateTime} is equal to ${currentDateTime}")
             GlobalScope.launch(Dispatchers.Main){
                 val id = withContext(Dispatchers.IO) {
-                    return@withContext db.todoDao().insertTask(
+                    return@withContext todoDatabase.todoDao().insertTask(
                         TodoModel(
                             title,
                             description,
@@ -351,7 +351,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val myFormat = "h:mm a"
         val sdf = SimpleDateFormat(myFormat)
         finalTime = myCalendar.time.time
-        timeEdt.setText(sdf.format(myCalendar.time))
+        binding.inputTime.setText(sdf.format(myCalendar.time))
 
     }
 
@@ -381,7 +381,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val myFormat = "EEE, d MMM yyyy"
         val sdf = SimpleDateFormat(myFormat)
         finalDate = myCalendar.time.time
-        dateEdt.setText(sdf.format(myCalendar.time))
+        binding.inputDate.setText(sdf.format(myCalendar.time))
 
     }
 
@@ -415,9 +415,9 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val myFormat = "EEE, d MMM yyyy"
         val sdf = SimpleDateFormat(myFormat)
         finalDate = myCalendar.time.time
-        dateEdt.setText(sdf.format(myCalendar.time))
+        binding.inputDate.setText(sdf.format(myCalendar.time))
 
-        timeEdt.visibility = View.VISIBLE
+        binding.inputTime.visibility = View.VISIBLE
 
     }
 
@@ -450,7 +450,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val myFormat = "h:mm a"
         val sdf = SimpleDateFormat(myFormat)
         finalTime = myCalendar.time.time
-        timeEdt.setText(sdf.format(myCalendar.time))
+        binding.inputTime.setText(sdf.format(myCalendar.time))
 
     }
 

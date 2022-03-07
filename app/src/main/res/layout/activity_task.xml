@@ -9,7 +9,7 @@
     tools:context=".TaskActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbarAddTask"
+        android:id="@+id/toolbar_task"
         android:background="@color/gray_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
             android:layout_marginEnd="40dp"
             android:layout_height="wrap_content"
             android:text="@string/new_task"
-            android:id="@+id/addTask"
+            android:id="@+id/toolbar_task_title"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textAlignment="center"/>
@@ -60,7 +60,7 @@
         android:background="@drawable/edittext_background"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
-        android:id="@+id/titleInpLay"/>
+        android:id="@+id/input_title"/>
 
 
     <TextView
@@ -83,7 +83,7 @@
         android:background="@drawable/edittext_background"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
-        android:id="@+id/taskInpLay"/>
+        android:id="@+id/input_description"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -108,7 +108,7 @@
         android:background="@drawable/edittext_background"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
-        android:id="@+id/dateEdt"/>
+        android:id="@+id/input_date"/>
 
     <EditText
         android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
         android:background="@drawable/edittext_background"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
-        android:id="@+id/timeEdt"/>
+        android:id="@+id/input_time"/>
 
 
 
@@ -148,7 +148,7 @@
 
         <Spinner
             android:theme="@style/spinner_divider"
-            android:id="@+id/spinnerCategory"
+            android:id="@+id/spinner_category"
             android:focusable="false"
             android:layout_weight="7"
             android:layout_width="0dp"
@@ -158,7 +158,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="14dp"
-            android:id="@+id/addNewCategory"
+            android:id="@+id/add_new_category_btn"
             android:background="@color/black"
             android:src="@drawable/ic_playlist_add_black_24dp"
             app:tint="@color/white"
@@ -177,7 +177,7 @@
     <androidx.appcompat.widget.AppCompatButton
         android:text="@string/save_task"
         android:background="@color/white"
-        android:id="@+id/saveBtn"
+        android:id="@+id/save_todo"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:layout_width="match_parent"

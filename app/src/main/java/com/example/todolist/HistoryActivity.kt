@@ -56,7 +56,7 @@ class HistoryActivity : AppCompatActivity() {
         }
         initSwipe()
 
-        binding.backHistory.setOnClickListener {
+        binding.toolbarHistoryBack.setOnClickListener {
             finish()
         }
     }
@@ -85,7 +85,7 @@ class HistoryActivity : AppCompatActivity() {
                             adapter.notifyItemRemoved(position)
                         }
                     }
-                    val snack = Snackbar.make(historyToolbar,"To Do deleted", Snackbar.LENGTH_SHORT)
+                    val snack = Snackbar.make(toolbar_history,"To Do deleted", Snackbar.LENGTH_SHORT)
                     snack.show()
                 }
                 else if (direction == ItemTouchHelper.RIGHT) {
@@ -97,7 +97,7 @@ class HistoryActivity : AppCompatActivity() {
                             adapter.notifyItemRemoved(position)
                         }
                     }
-                    val snack = Snackbar.make(historyToolbar,"To Do set as unfinished", Snackbar.LENGTH_SHORT)
+                    val snack = Snackbar.make(toolbar_history,"To Do set as unfinished", Snackbar.LENGTH_SHORT)
                     snack.show()
 
                 }

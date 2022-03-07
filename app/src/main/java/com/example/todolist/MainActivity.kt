@@ -5,12 +5,13 @@ import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +47,15 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         setTheSpinner()
+        lifecycleScope.launch(Dispatchers.IO) {
+            list = todoDatabase.todoDao().getAllUnFinishedTasks() as ArrayList<TodoModel>
+            adapter = TodoAdapter(list)
+            binding.todoRv.apply {
+                layoutManager = LinearLayoutManager(this@MainActivity)
+                adapter = this@MainActivity.adapter
+            }
+            binding.todoRv.scheduleLayoutAnimation()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,28 +66,34 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        binding.todoRv.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = this@MainActivity.adapter
+        Log.e("catyegoy","on create")
+        lifecycleScope.launch(Dispatchers.IO) {
+            list = todoDatabase.todoDao().getAllUnFinishedTasks() as ArrayList<TodoModel>
+            adapter = TodoAdapter(list)
+            binding.todoRv.apply {
+                layoutManager = LinearLayoutManager(this@MainActivity)
+                adapter = this@MainActivity.adapter
+            }
+            binding.todoRv.scheduleLayoutAnimation()
         }
-        binding.todoRv.scheduleLayoutAnimation()
-        initSwipe()
-        todoDatabase.todoDao().getTask().observe(this, Observer {
+
+        todoDatabase.todoDao().getTask().observe(this) {
+            Log.e("observer", "onCreate")
             list.clear()
             if (!it.isNullOrEmpty())
                 list.addAll(it)
-            adapter.notifyDataSetChanged()
+//            adapter.notifyDataSetChanged()
             if (list.isEmpty()) {
                 binding.notFoundTextview.visibility = View.VISIBLE
                 binding.notFoundAnim.visibility = View.VISIBLE
-            }
-            else {
+            } else {
                 binding.notFoundTextview.visibility = View.GONE
                 binding.notFoundAnim.visibility = View.GONE
             }
-        })
+        }
         setTheSearchBar()
         setTheSpinner()
+        initSwipe()
         binding.toolbarDelete.setOnClickListener {
             deleteCategory()
         }
@@ -90,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setTheSearchBar() {
-
+        Log.e("observer","setTheSearchBar")
         // setOnSearchListener is when user clicks on the search icon, it should by default show all the todos
         binding.toolbarSearch.setOnSearchClickListener {
             displayTodoByCategory(categories[0])
@@ -128,7 +144,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun deleteCategory(){
-        val cat = binding.toolbarSpinner.selectedItem as String
+        val deletedCategory = binding.toolbarSpinner.selectedItem as String
         val dialog = Dialog(this)
         if (bindingDeleteCategory.root.parent!=null) {
             val parent = bindingDeleteCategory.root.parent as ViewGroup
@@ -138,34 +154,29 @@ class MainActivity : AppCompatActivity() {
         val w = resources.displayMetrics.widthPixels*0.95   // to occupy 95% of screen's width
         dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog.show()
-        bindingDeleteCategory.deleteCategory.text = String.format(getString(R.string.delete_category_text),cat)
+        bindingDeleteCategory.deleteCategory.text = String.format(getString(R.string.delete_category_text),deletedCategory)
         bindingDeleteCategory.cancelButtonDelete.setOnClickListener {
             dialog.dismiss()
         }
         bindingDeleteCategory.yesButtonDelete.setOnClickListener {
             val todosToBeDeleted = ArrayList<Long>()
-            runBlocking {
-                launch(Dispatchers.IO) {
-                    for (x in todoDatabase.todoDao().getAllTasks()){
-                        if(x.category == cat)
-                            todosToBeDeleted.add(x.id)
+            lifecycleScope.launch {
+                val job1 = async(Dispatchers.IO) {
+                    val allTasks = todoDatabase.todoDao().getAllTasks()
+                    for (task in allTasks){
+                        if(task.category == deletedCategory)
+                            todosToBeDeleted.add(task.id)
                     }
+                    for (id in todosToBeDeleted){
+                        todoDatabase.todoDao().deleteTask(id)
+                    }
+                    categoryDatabase.categoryDao().deleteCategory(deletedCategory)
+                }
+                job1.await()
 
-                }
-            }
-            runBlocking {
-                launch(Dispatchers.IO) {
-                    for(x in todosToBeDeleted)
-                        todoDatabase.todoDao().deleteTask(x)
-                }
-            }
-            runBlocking {
-                launch(Dispatchers.IO) {
-                    categoryDatabase.categoryDao().deleteCategory(cat)
-                }
             }
             val spinnerAdapter = binding.toolbarSpinner.adapter as ArrayAdapter<String>
-            spinnerAdapter.remove(cat)
+            spinnerAdapter.remove(deletedCategory)
             spinnerAdapter.notifyDataSetChanged()
             displayTodoByCategory(categories[spinnerAdapter.count-1])
             dialog.dismiss()
@@ -173,13 +184,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setTheSpinner() {
-
+        Log.e("observer","setTheSpinner")
         val databaseLabels = mutableListOf<String>()
         databaseLabels.addAll(defaultCategories)
-        runBlocking {
-            launch(Dispatchers.IO) {
-                databaseLabels.addAll(categoryDatabase.categoryDao().getCategories2())
-            }
+        lifecycleScope.launch(Dispatchers.IO) {
+            databaseLabels.addAll(categoryDatabase.categoryDao().getCategories2())
         }
         categories = databaseLabels as ArrayList<String>
         val spinnerAdapter:ArrayAdapter<String> = object: ArrayAdapter<String>(this, R.layout.spinner_item_layout_main, categories){
@@ -228,9 +237,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun displayTodoByTitle(newText: String = "") {
-        todoDatabase.todoDao().getTask().observe(this, Observer {
+        todoDatabase.todoDao().getTask().observe(this) {
+            Log.e("observer", "displayTodoByTitle")
+            list.clear()
             if (it.isNotEmpty()) {
-                list.clear()
                 if (TextUtils.isEmpty(newText))
                     list.addAll(it)
                 else {
@@ -240,23 +250,24 @@ class MainActivity : AppCompatActivity() {
                         }
                     )
                 }
-                adapter.notifyDataSetChanged()
+//                adapter.notifyDataSetChanged()
             }
             if (list.isEmpty()) {
                 binding.notFoundTextview.visibility = View.VISIBLE
                 binding.notFoundAnim.visibility = View.VISIBLE
-            }
-            else {
+            } else {
                 binding.notFoundTextview.visibility = View.GONE
                 binding.notFoundAnim.visibility = View.GONE
             }
-        })
+        }
     }
 
     fun displayTodoByCategory(newText: String) {
-        todoDatabase.todoDao().getTask().observe(this, Observer {
+        todoDatabase.todoDao().getTask().observe(this) {
+            Log.e("observer", "displayTodoByCategory")
+            Log.e("observer",it.toString())
+            list.clear()
             if (it.isNotEmpty()) {
-                list.clear()
                 if (TextUtils.equals(newText, "All"))
                     list.addAll(it)
                 else {
@@ -266,17 +277,18 @@ class MainActivity : AppCompatActivity() {
                         }
                     )
                 }
-                adapter.notifyDataSetChanged()
+//                adapter.notifyDataSetChanged()
             }
+            Log.e("catyegoy 1",list.toString())
+            Log.e("catyegoy 2","\n")
             if (list.isEmpty()) {
                 binding.notFoundTextview.visibility = View.VISIBLE
                 binding.notFoundAnim.visibility = View.VISIBLE
-            }
-            else {
+            } else {
                 binding.notFoundTextview.visibility = View.GONE
                 binding.notFoundAnim.visibility = View.GONE
             }
-        })
+        }
     }
 
     private fun openNewTask() {
@@ -337,12 +349,13 @@ class MainActivity : AppCompatActivity() {
                     updateTime3(restoredView.txtShowTime.text.toString()),0,id)
                 if (direction == ItemTouchHelper.LEFT) {
 
-                    GlobalScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         todoDatabase.todoDao().deleteTask(adapter.getItemId(position))
+                        withContext (Dispatchers.Main) {
+                            list.removeAt(position)
+                            adapter.notifyItemRemoved(position)
+                        }
                     }
-
-
-
 
                     val snack = Snackbar.make(binding.toolbar,"To Do deleted",Snackbar.LENGTH_SHORT)
 
@@ -350,11 +363,11 @@ class MainActivity : AppCompatActivity() {
                     snack.setAction("UNDO") {
 
                         // insert the deleted to-do as a new to-do, passing the primary key of the former to latter
-                        GlobalScope.launch(Dispatchers.Main) {
-                            val id2 = withContext(Dispatchers.IO) {
-                                return@withContext todoDatabase.todoDao().insertTask(
-                                    restoredModel
-                                )
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            todoDatabase.todoDao().insertTask(restoredModel)
+                            withContext (Dispatchers.Main) {
+                                list.add(position,restoredModel)
+                                adapter.notifyItemInserted(position)
                             }
                         }
 
@@ -363,13 +376,18 @@ class MainActivity : AppCompatActivity() {
                     }
                     snack.setActionTextColor(getColor(R.color.green))
                     snack.show()
+//                    displayTodoByCategory(restoredView.txtShowCategory.text.toString())
+
                 } else if (direction == ItemTouchHelper.RIGHT) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         todoDatabase.todoDao().finishTask(adapter.getItemId(position))
+                        withContext (Dispatchers.Main) {
+                            list.removeAt(position)
+                            adapter.notifyItemRemoved(position)
+                        }
                     }
                     Snackbar.make(binding.toolbar,"To Do finished",Snackbar.LENGTH_SHORT).show()
                 }
-                displayTodoByCategory(restoredView.txtShowCategory.text.toString())
             }
 
             override fun onChildDraw(
