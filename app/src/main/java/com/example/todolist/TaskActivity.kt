@@ -14,7 +14,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.lifecycleScope
 import com.example.todolist2.databinding.ActivityTaskBinding
+import com.example.todolist2.databinding.AddCategoryDialogBinding
+import com.example.todolist2.databinding.DiscardDialogBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -30,6 +33,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var timeSetListener: TimePickerDialog.OnTimeSetListener
 
     private lateinit var binding:ActivityTaskBinding
+    private lateinit var bindingAddCategory: AddCategoryDialogBinding
+    private lateinit var bindingDiscard: DiscardDialogBinding
 
     private var finalDate = 0L
     private var finalTime = 0L
@@ -58,6 +63,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         overridePendingTransition(R.anim.fadein,R.anim.fadeout)
         super.onCreate(savedInstanceState)
         binding = ActivityTaskBinding.inflate(layoutInflater)
+        bindingAddCategory = AddCategoryDialogBinding.inflate(layoutInflater)
+        bindingDiscard = DiscardDialogBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setUpSpinner()
@@ -123,37 +130,38 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun addNewCategory(){
         val dialog = Dialog(binding.inputTitle.context)
-        dialog.setContentView(R.layout.add_category_dialog)
+        if (bindingAddCategory.root.parent!=null) {
+            val parent = bindingAddCategory.root.parent as ViewGroup
+            parent.removeView(bindingAddCategory.root)
+        }
+        dialog.setContentView(bindingAddCategory.root)
         dialog.show()
-        val newCategoryOk = dialog.findViewById<Button>(R.id.new_category_ok)
-        val newCategoryCancel = dialog.findViewById<Button>(R.id.new_category_cancel)
-        val newCategoryName = dialog.findViewById<EditText>(R.id.new_category_name)
-        newCategoryOk.isEnabled = false
-        newCategoryOk.setTextColor(getColor(R.color.gray))
-        newCategoryName.addTextChangedListener {
-            var input = newCategoryName.text.toString()
+        bindingAddCategory.newCategoryOk.isEnabled = false
+        bindingAddCategory.newCategoryOk.setTextColor(getColor(R.color.gray))
+        bindingAddCategory.newCategoryName.addTextChangedListener {
+            var input = bindingAddCategory.newCategoryName.text.toString()
             // input.trim() doesn't work for input with multiple spaces eg "    " (4 spaces)
             input = input.trim()
-            newCategoryOk.isEnabled = input.isNotBlank()
-            if(newCategoryOk.isEnabled)
-                newCategoryOk.setTextColor(getColor(R.color.green))
+            bindingAddCategory.newCategoryOk.isEnabled = input.isNotBlank()
+            if(bindingAddCategory.newCategoryOk.isEnabled)
+                bindingAddCategory.newCategoryOk.setTextColor(getColor(R.color.green))
             else
-                newCategoryOk.setTextColor(getColor(R.color.gray))
+                bindingAddCategory.newCategoryOk.setTextColor(getColor(R.color.gray))
         }
-        newCategoryCancel.setOnClickListener {
+        bindingAddCategory.newCategoryCancel.setOnClickListener {
             dialog.dismiss()
         }
-        newCategoryOk.setOnClickListener {
-            val newCategory = newCategoryName.text.toString()
+        bindingAddCategory.newCategoryOk.setOnClickListener {
+            val newCategory = bindingAddCategory.newCategoryName.text.toString()
             newCategory.trim()
-            var already = false
+            var categoryAlreadyExists = false
             runBlocking {
                 launch(Dispatchers.IO) {
-                    if(newCategory in categoryDatabase.categoryDao().getCategories2())
-                        already = true
+                    if(newCategory in categoryDatabase.categoryDao().getCategoriesNames())
+                        categoryAlreadyExists = true
                 }
             }
-            if (already){
+            if (categoryAlreadyExists){
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                 val snack = Snackbar.make(binding.inputTitle,"Category already exists!",Snackbar.LENGTH_SHORT)
@@ -183,7 +191,11 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onBackPressed() {
         val dialog = Dialog(binding.inputTitle.context)
-        dialog.setContentView(R.layout.dialog_layout)
+        if (bindingDiscard.root.parent!=null) {
+            val parent = bindingDiscard.root.parent as ViewGroup
+            parent.removeView(bindingDiscard.root)
+        }
+        dialog.setContentView(bindingDiscard.root)
         val w = resources.displayMetrics.widthPixels*0.95   // to occupy 95% of screen's width
         dialog.window?.setLayout(w.toInt(),ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog.show()
@@ -194,15 +206,12 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val title2 = intent.getStringExtra("title")
         if(title2!=null)
             dialogText = "Discard changes?"
-        val discard = dialog.findViewById<TextView>(R.id.discard)
-        val cancelBtn = dialog.findViewById<Button>(R.id.cancel_button)
-        val yesBtn = dialog.findViewById<Button>(R.id.yes_button)
-        discard.text = dialogText
+        bindingDiscard.discard.text = dialogText
 //        yes_button.setBackgroundColor(Color.RED)  // why this doesn't happen???
-        cancelBtn.setOnClickListener {
+        bindingDiscard.cancelButton.setOnClickListener {
             dialog.dismiss()
         }
-        yesBtn.setOnClickListener {
+        bindingDiscard.yesButton.setOnClickListener {
             dialog.dismiss()
             finish()
         }
@@ -210,11 +219,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     private fun setUpSpinner() {
         val databaseLabels = mutableListOf<String>()
         databaseLabels.addAll(defaultCategories)
-
-        runBlocking {
-            GlobalScope.launch {
-                databaseLabels.addAll(categoryDatabase.categoryDao().getCategories2())
-            }
+        lifecycleScope.launch(Dispatchers.IO) {
+            databaseLabels.addAll(categoryDatabase.categoryDao().getCategoriesNames())
         }
 
         val spinnerAdapter:ArrayAdapter<String> = object: ArrayAdapter<String>(this, R.layout.spinner_item_layout, databaseLabels){
@@ -266,11 +272,6 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val description = binding.inputDescription.text.toString()
         if (TextUtils.isEmpty(title))
             Toast.makeText(binding.inputTitle.context,"Please enter a title",Toast.LENGTH_SHORT).show()
-        else if(finalDate == 0L)
-            Toast.makeText(binding.inputTitle.context,"Please select a date",Toast.LENGTH_SHORT).show()
-        else if(finalTime == 0L)
-            Toast.makeText(binding.inputTitle.context,"Please select a time",Toast.LENGTH_SHORT).show()
-
         else {
             var isUpdated = false
             if (position!=-1){
@@ -309,9 +310,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
                     )
                 }
             }
-            var msg = "To Do saved"
-            if(isUpdated)
-                msg = "To Do updated"
+            val msg = if (isUpdated) "To Do saved" else "To Do updated"
             Snackbar.make(findViewById(android.R.id.content),msg,Snackbar.LENGTH_SHORT).show()
             Toast.makeText(this@TaskActivity,msg,Toast.LENGTH_SHORT).show()
             finish()

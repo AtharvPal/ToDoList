@@ -29,8 +29,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var bindingDeleteCategory: DeleteCategoryLayoutBinding
-    var list = arrayListOf<TodoModel>()
-    var adapter = TodoAdapter(list)
+    private var list = arrayListOf<TodoModel>()
+    private var adapter = TodoAdapter(list)
 
     private val defaultCategories = listOf("All", "Personal", "Business", "Insurance", "Shopping", "Banking", "Other")
     private val months = listOf("Jan", "Feb", "Mar", "Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity() {
         val databaseLabels = mutableListOf<String>()
         databaseLabels.addAll(defaultCategories)
         lifecycleScope.launch(Dispatchers.IO) {
-            databaseLabels.addAll(categoryDatabase.categoryDao().getCategories2())
+            databaseLabels.addAll(categoryDatabase.categoryDao().getCategoriesNames())
         }
         categories = databaseLabels as ArrayList<String>
         val spinnerAdapter:ArrayAdapter<String> = object: ArrayAdapter<String>(this, R.layout.spinner_item_layout_main, categories){

@@ -15,7 +15,7 @@ interface CategoryDao {
     fun getCategories():LiveData<List<CategoryModel>>
 
     @Query("Select category from CategoryModel")
-    fun getCategories2():List<String>
+    fun getCategoriesNames():List<String>
 
     @Query("Delete from CategoryModel where category=:category")
     fun deleteCategory(category: String)
