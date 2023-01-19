@@ -18,4 +18,5 @@
     <string name="set_reminder_date_and_time">Set reminder date and time</string>
     <string name="select_category">Select category</string>
     <string name="save_task">Save Task</string>
+    <string name="ok">OK</string>
 </resources>

@@ -27,19 +27,16 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
         holder.bind(list[position],position)
         holder.itemView.share.setOnClickListener {
-            Log.e("share","done")
-            var info = holder.itemView.context.applicationInfo
-            var intent = Intent()
+            val intent = Intent()
             intent.action = Intent.ACTION_SEND
 
             var todoData = ""
             todoData+="Title: "+holder.itemView.txtShowTitle.text.toString()
-            if (!holder.itemView.txtShowTask.text.isBlank())
+            if (holder.itemView.txtShowTask.text.isNotBlank())
                 todoData+="\nDescription: "+holder.itemView.txtShowTask.text.toString()
             todoData+="\nDate: "+holder.itemView.txtShowDate.text.toString()
             todoData+="\nTime: "+holder.itemView.txtShowTime.text.toString()
             todoData+="\nCategory: "+holder.itemView.txtShowCategory.text.toString()
-            Log.e("Share data",todoData)
             
             intent.putExtra(Intent.EXTRA_TEXT,todoData)
             intent.type = "text/plain"
@@ -47,23 +44,19 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
         }
         holder.itemView.setOnClickListener(object :View.OnClickListener{
             override fun onClick(v: View?) {
-                var title = v?.findViewById<TextView>(R.id.txtShowTitle)
-                var desc = v?.findViewById<TextView>(R.id.txtShowTask)
-                var category = v?.findViewById<TextView>(R.id.txtShowCategory)
-                var time = v?.findViewById<TextView>(R.id.txtShowTime)
-                var date = v?.findViewById<TextView>(R.id.txtShowDate)
-
-                var intent = Intent(holder.itemView.context,TaskActivity::class.java)
+                val title = v?.findViewById<TextView>(R.id.txtShowTitle)
+                val desc = v?.findViewById<TextView>(R.id.txtShowTask)
+                val category = v?.findViewById<TextView>(R.id.txtShowCategory)
+                val time = v?.findViewById<TextView>(R.id.txtShowTime)
+                val date = v?.findViewById<TextView>(R.id.txtShowDate)
+                val intent = Intent(holder.itemView.context,TaskActivity::class.java)
 
                 intent.putExtra("title",title?.text.toString())
                 intent.putExtra("desc",desc?.text.toString())
                 intent.putExtra("category",category?.text.toString())
                 intent.putExtra("date",date?.text.toString())
                 intent.putExtra("time",time?.text.toString())
-
                 intent.putExtra("position",getItemId(position).toInt())
-
-                Log.e("ok",getItemId(position).toString())
 
                 holder.itemView.context.startActivity(intent)
             }
@@ -88,7 +81,6 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
                 txtShowCategory.text = todoModel.category
                 updateTime(todoModel.time)
                 updateDate(todoModel.date)
-//                itemView.animation = AnimationUtils.loadAnimation(itemView.context,R.anim.fall_down)
 
                 val myFormat = "EEE, d MMM yyyy h:mm a"
                 val sdf = SimpleDateFormat(myFormat)
@@ -97,24 +89,18 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
                 val myFormat2 = "h:mm a"
                 val sdf2 = SimpleDateFormat(myFormat2)
                 val currentDateTime = sdf.format(Date(System.currentTimeMillis()))
-//            Log.e("compare 1","${sdf.format(Date(myCalendar.timeInMillis))}: ${currentDateTime} and ${myCalendar.timeInMillis}: ${System.currentTimeMillis()}")
-//            Log.e("compare 2","${sdf.format(Date(finalDate))} and ${sdf.format(Date(finalTime))}")
-//            Log.e("compare 3","${sdf1.format(Date(finalDate))} and ${sdf2.format(Date(finalTime))}")
                 val combinedDateTime = sdf1.format(todoModel.date)+" "+ sdf2.format(todoModel.time)
                 if (sdf.parse(combinedDateTime).before(sdf.parse(currentDateTime))) {
                     txtShowDate.setTextColor(ContextCompat.getColor(itemView.context,R.color.red_delete))  // complex way :(
                     txtShowTime.setTextColor(ContextCompat.getColor(itemView.context,R.color.red_delete))
-                    Log.e("compare 4", " ${combinedDateTime} is before ${currentDateTime}")
+                    Log.e("compareDates", " $combinedDateTime is before $currentDateTime")
                 }
                 else{
                     txtShowDate.setTextColor(Color.WHITE)
                     txtShowTime.setTextColor(Color.WHITE)
-                    Log.e("compare 4"," ${combinedDateTime} is equal to or after ${currentDateTime}")
-
+                    Log.e("compareDates"," $combinedDateTime is equal to or after $currentDateTime")
                 }
-
             }
-
         }
 
         private fun updateTime(time: Long) {
@@ -122,7 +108,6 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
             val myformat = "h:mm a"
             val sdf = SimpleDateFormat(myformat)
             itemView.txtShowTime.text = sdf.format(Date(time))
-
         }
 
         private fun updateDate(time: Long) {
@@ -130,8 +115,6 @@ class TodoAdapter(val list: List<TodoModel>) : RecyclerView.Adapter<TodoAdapter.
             val myformat = "EEE, d MMM yyyy"
             val sdf = SimpleDateFormat(myformat)
             itemView.txtShowDate.text = sdf.format(Date(time))
-
         }
     }
-
 }

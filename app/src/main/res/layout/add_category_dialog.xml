@@ -12,13 +12,20 @@
         android:textCursorDrawable="@drawable/cursor"
         android:hint="@string/new_category_name"
         android:maxLength="14"
+        android:background="@drawable/searchview_background"
+        android:padding="12dp"
         android:id="@+id/new_category_name"
-        android:textColorHint="@color/gray"/>
+        android:textColorHint="@color/white2"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@+id/new_category_name">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:layout_width="0dp"
@@ -27,7 +34,7 @@
             android:id="@+id/new_category_ok"
             android:background="@color/black"
             android:textColor="@color/green"
-            android:text="OK"/>
+            android:text="@string/ok"/>
         <androidx.appcompat.widget.AppCompatButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -35,6 +42,6 @@
             android:id="@+id/new_category_cancel"
             android:background="@color/black"
             android:textColor="@color/green"
-            android:text="Cancel"/>
+            android:text="@string/cancel"/>
     </LinearLayout>
 </RelativeLayout>
